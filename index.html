@@ -3,695 +3,462 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Handset Ledger — buy outright or bill it</title>
+<meta name="description" content="Compare the real cost of buying a phone outright with a SIM-only plan versus taking a phone contract.">
+<title>Phone Deal Comparator — Outright vs Contract</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  :root{
-    --ink:#171d1b;
-    --paper:#f6f3ea;
-    --paper-2:#eee9db;
-    --shell:#0f1a19;
-    --shell-2:#16241f;
-    --teal:#0f6e56;
-    --teal-ink:#04342c;
-    --teal-bg:#e1f5ee;
-    --amber:#8a5a10;
-    --amber-ink:#412402;
-    --amber-bg:#faeeda;
-    --muted:#5f5e56;
-    --line: rgba(23,29,27,0.14);
-    --line-strong: rgba(23,29,27,0.28);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--shell);
-    background-image:
-      radial-gradient(circle at 15% 0%, rgba(255,255,255,0.04), transparent 45%),
-      radial-gradient(circle at 85% 100%, rgba(255,255,255,0.03), transparent 40%);
-    color:var(--ink);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-    padding:40px 20px 80px;
-  }
-  .wrap{max-width:980px;margin:0 auto;}
-  header{
-    text-align:center;
-    color:var(--paper);
-    margin-bottom:36px;
-  }
-  header .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:#8fb8ac;
-    margin:0 0 10px;
-  }
-  header h1{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:clamp(28px,4vw,42px);
-    margin:0 0 10px;
-    letter-spacing:-0.01em;
-  }
-  header p{
-    color:#c7cfcb;
-    max-width:560px;
-    margin:0 auto;
-    font-size:15px;
-    line-height:1.6;
-  }
+:root{
+  --bg:#0f1a19;
+  --surface:#f6f3ea;
+  --surface-soft:#eee9db;
+  --ink:#171d1b;
+  --muted:#5f5e56;
+  --line:rgba(23,29,27,0.14);
+  --line-strong:rgba(23,29,27,0.28);
+  --green:#0f6e56;
+  --green-dark:#04342c;
+  --green-soft:#e1f5ee;
+  --amber:#8a5a10;
+  --amber-soft:#faeeda;
+  --blue:#0f6e56;
+  --blue-soft:#e1f5ee;
+  --danger:#8f3f35;
+  --shell:#0f1a19;
+  --shell-2:#16241f;
+  --paper:#f6f3ea;
+  --paper-2:#eee9db;
+  --shadow:0 20px 50px rgba(0,0,0,.35);
+  --radius:14px;
+}*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--shell);
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(255,255,255,.04), transparent 45%),
+    radial-gradient(circle at 85% 100%, rgba(255,255,255,.03), transparent 40%);
+  color:var(--ink);
+  font-family:Inter,system-ui,sans-serif;
+  min-height:100vh;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:1080px;margin:0 auto;padding:44px 20px 72px}
+.hero{max-width:760px;margin:0 auto 36px;text-align:center;color:var(--paper)}
+.eyebrow{font:600 12px/1.2 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#8fb8ac;margin:0 0 10px}
+h1{font:700 clamp(32px,5vw,52px)/1.05 'Space Grotesk',sans-serif;letter-spacing:-.035em;margin:0 0 14px}
+.hero p{margin:0 auto;color:#c7cfcb;font-size:15px;line-height:1.65;max-width:680px}
+.hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.hero-badge{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:7px 11px;font-size:12px;color:#c7cfcb}
 
-  .panel{
-    background:var(--paper);
-    border-radius:14px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.35);
-    overflow:hidden;
-    margin-bottom:28px;
-  }
-  .panel-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:16px 24px;
-    background:var(--shell-2);
-    color:var(--paper);
-  }
-  .panel-head h2{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:15px;
-    font-weight:700;
-    letter-spacing:0.02em;
-    margin:0;
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-  .panel-head h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);}
-  .panel-body{padding:24px;}
+.progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 18px}
+.progress div{height:4px;background:rgba(255,255,255,.12);border-radius:99px}
+.progress div:first-child{background:var(--green)}
 
-  .shared-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:18px 24px;
-  }
-  .field label{
-    display:block;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:0.06em;
-    text-transform:uppercase;
-    color:var(--muted);
-    margin-bottom:6px;
-  }
-  input[type="text"], input[type="number"]{
-    width:100%;
-    padding:10px 12px;
-    border:1px solid var(--line-strong);
-    border-radius:8px;
-    background:#fff;
-    font-family:'IBM Plex Mono',monospace;
-    font-size:15px;
-    color:var(--ink);
-  }
-  input[type="text"]:focus, input[type="number"]:focus{outline:2px solid var(--teal);outline-offset:1px;}
-  .suffix-wrap{position:relative;}
-  .suffix-wrap span{
-    position:absolute;right:12px;top:50%;transform:translateY(-50%);
-    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);
-  }
-  .suffix-wrap:not(.prefix-wrap) input{padding-right:46px;}
-  .prefix-wrap input{padding-left:26px;}
-  .prefix-wrap span{
-    position:absolute;left:12px;top:50%;transform:translateY(-50%);
-    font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);
-  }
+.panel{background:var(--paper);border:0;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:28px}
+.panel-head{padding:18px 24px;display:flex;gap:14px;align-items:flex-start;background:var(--shell-2);color:var(--paper);border-bottom:0}
+.step{width:30px;height:30px;border-radius:9px;background:var(--green);color:#fff;font:600 13px/30px 'IBM Plex Mono',monospace;text-align:center;flex:0 0 auto}
+.panel-head h2{font:700 20px/1.2 'Space Grotesk',sans-serif;margin:0 0 5px}
+.panel-head p{margin:0;color:#c7cfcb;font-size:13px;line-height:1.5}
+.panel-body{padding:24px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.col-12{grid-column:span 12}.col-8{grid-column:span 8}.col-6{grid-column:span 6}.col-4{grid-column:span 4}.col-3{grid-column:span 3}
+.field label,.field-label{display:block;margin:0 0 7px;font:500 11px/1.25 'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.field .hint{display:block;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}
+input[type="text"],input[type="number"],select{
+  width:100%;height:48px;padding:0 13px;border:1px solid var(--line-strong);border-radius:11px;background:#fff;color:var(--ink);transition:.15s border,.15s box-shadow;font:500 15px 'IBM Plex Mono',monospace;
+}
+select{padding-right:35px}
+input:focus,select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(8,119,95,.12)}
+input:disabled,select:disabled{background:#f2f4f3;color:#89938f;cursor:not-allowed}
+.money,.suffix{position:relative}
+.money input{padding-left:30px}
+.money>span,.suffix>span{position:absolute;top:50%;transform:translateY(-50%);color:var(--muted);font:600 13px 'IBM Plex Mono',monospace;pointer-events:none;z-index:1}
+.money>span{left:12px}.suffix>span{right:12px}.suffix input{padding-right:58px}
+.inline-action{display:flex;gap:9px;align-items:flex-end}.inline-action .field{flex:1}
+.price-entry-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:stretch}.price-entry-row .btn{height:48px}.price-field .hint{margin-top:7px}
+.btn{border:1px solid transparent;border-radius:11px;min-height:48px;padding:0 16px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark)}
+.btn-secondary{background:var(--shell-2);color:var(--paper);border-color:var(--shell-2)}.btn-secondary:hover{background:#22342f}
+.btn-link{min-height:40px;padding:0;border:0;background:none;color:var(--green);font-weight:700}
+.price-status{margin-top:9px;padding:10px 12px;border-radius:10px;background:var(--surface-soft);color:var(--muted);font:400 12px/1.45 'IBM Plex Mono',monospace;display:flex;align-items:flex-start;gap:8px}
+.price-status.ok{background:var(--green-soft);color:var(--green-dark)}
+.price-status.warn{background:var(--amber-soft);color:#704300}
+.status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;margin-top:5px;flex:0 0 auto}
 
-  .slider-row{margin-top:22px;padding-top:18px;border-top:1px dashed var(--line-strong);}
-  .slider-row label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:8px;}
-  .slider-row label b{color:var(--ink);font-size:13px;letter-spacing:0;text-transform:none;}
-  input[type="range"]{width:100%;accent-color:var(--teal);height:4px;}
+.range-box{margin-top:22px;padding:18px 18px 16px;background:var(--surface-soft);border:1px solid var(--line);border-radius:13px}
+.range-top{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:10px}
+.range-top span{font:500 11px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}.range-top strong{font:600 14px 'IBM Plex Mono',monospace;color:var(--green-dark)}
+input[type="range"]{width:100%;accent-color:var(--green)}
+.range-scale{display:flex;justify-content:space-between;color:#89938f;font:400 10px 'IBM Plex Mono',monospace;margin-top:3px}
 
-  /* Two option columns */
-  .options{
-    display:grid;
-    grid-template-columns:1fr auto 1fr;
-    gap:0;
-    align-items:stretch;
-  }
-  .option{padding:24px;}
-  .option .head{
-    display:flex;align-items:center;gap:10px;margin-bottom:6px;
-  }
-  .option .head .tag{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;text-transform:uppercase;letter-spacing:0.08em;
-    padding:3px 9px;border-radius:20px;
-  }
-  .tag.teal{background:var(--teal-bg);color:var(--teal-ink);}
-  .tag.amber{background:var(--amber-bg);color:var(--amber-ink);}
-  .option h3{font-family:'Space Grotesk',sans-serif;font-size:18px;margin:0;}
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.option-card{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fffdf7}
+.option-card.a{box-shadow:inset 0 3px 0 var(--green)}
+.option-card.b{box-shadow:inset 0 3px 0 #c77a16}
+.option-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.option-title h3{font:700 19px 'Space Grotesk',sans-serif;margin:3px 0 0}.tag{font:600 10px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.08em;padding:5px 8px;border-radius:999px}
+.tag-a{background:var(--green-soft);color:var(--green-dark)}.tag-b{background:var(--amber-soft);color:#734300}
+.option-card .field+.field{margin-top:15px}
+.row-toggle{display:flex;align-items:center;gap:10px;margin-top:15px;min-height:36px}
+.row-toggle label:last-child{font:500 12px 'IBM Plex Mono',monospace;color:#3f4a46;cursor:pointer}
+.switch{position:relative;width:43px;height:25px;flex:0 0 auto}
+.switch input{position:absolute;opacity:0;pointer-events:none}
+.switch span{position:absolute;inset:0;background:#cbd4d0;border-radius:999px;cursor:pointer;transition:.15s}
+.switch span:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:.15s}
+.switch input:checked+span{background:var(--green)}
+.switch input:checked+span:before{transform:translateX(18px)}
+.reveal{display:none;margin-top:12px}.reveal.show{display:block}
+.info-callout{margin-top:14px;padding:11px 12px;border-left:3px solid var(--green);background:var(--green-soft);font:400 12px/1.5 'IBM Plex Mono',monospace;color:var(--green-dark);border-radius:0 8px 8px 0}
+.segmented{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line-strong);border-radius:11px;overflow:hidden;margin-top:6px}
+.segmented input{position:absolute;opacity:0}
+.segmented label{margin:0;padding:10px 9px;text-align:center;font:600 11px 'IBM Plex Mono',monospace;cursor:pointer;background:#fff;color:var(--muted)}
+.segmented input:checked+label{background:var(--green-soft);color:var(--green-dark)}
 
-  .toggle-row{
-    display:flex;align-items:center;gap:10px;margin:16px 0 4px;
-  }
-  .toggle-row label{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);}
-  .switch{position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0;}
-  .switch input{opacity:0;width:0;height:0;}
-  .slider-tog{position:absolute;cursor:pointer;inset:0;background:#cfcabb;border-radius:22px;transition:.15s;}
-  .slider-tog:before{content:"";position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.15s;}
-  input:checked + .slider-tog{background:var(--amber);}
-  input:checked + .slider-tog:before{transform:translateX(16px);}
+.plan-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center}
+.vs{width:38px;height:38px;border-radius:50%;background:var(--surface-soft);border:1px solid var(--line);display:grid;place-items:center;font:600 11px 'IBM Plex Mono',monospace;color:var(--muted)}
+.plan-card{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fffdf7}
+.plan-card h3{font:700 16px 'Space Grotesk',sans-serif;margin:0 0 14px}
+.plan-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-  .divider{
-    width:1px;
-    background-image:repeating-linear-gradient(to bottom, var(--line-strong) 0, var(--line-strong) 8px, transparent 8px, transparent 16px);
-    position:relative;
-  }
-  .divider .notch{
-    position:absolute;left:50%;transform:translateX(-50%);
-    width:22px;height:22px;background:var(--shell-2);border-radius:50%;
-  }
-  .divider .notch.top{top:-11px;}
-  .divider .notch.bottom{bottom:-11px;}
+.results-hero{padding:26px;background:var(--shell-2);color:var(--paper)}
+.result-kicker{font:600 11px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.11em;color:#9fd5c5;margin-bottom:8px}
+.result-title{font:700 clamp(24px,4vw,34px)/1.15 'Space Grotesk',sans-serif;margin:0 0 8px;max-width:760px}
+.result-lead{color:#c7d7d1;font:400 13px/1.6 'IBM Plex Mono',monospace;max-width:780px}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.summary-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:13px}
+.summary-card .k{font:500 10px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.05em;color:#aabdb6;margin-bottom:6px}.summary-card .v{font:600 17px 'IBM Plex Mono',monospace}.summary-card .s{font:400 10px/1.4 'IBM Plex Mono',monospace;color:#aabdb6;margin-top:4px}
+.comparison-body{padding:24px}
+.insight-list{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin:0 0 22px;padding:0;list-style:none}
+.insight-list li{border:1px solid var(--line);background:#fffdf7;border-radius:10px;padding:13px 14px;font:400 12px/1.55 'IBM Plex Mono',monospace;color:#46514d}
+.insight-list strong{color:var(--ink)}
+.cost-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.cost-card{border:1px solid var(--line);border-radius:14px;padding:17px;position:relative}.cost-card.winner{border-color:#8dcab8;background:#f5fcf9}.cost-card .label{font:500 10px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}.cost-card .total{font:700 28px 'IBM Plex Mono',monospace}.cost-card .sub{font:400 11px/1.5 'IBM Plex Mono',monospace;color:var(--muted);margin-top:7px}.winner-pill{position:absolute;top:14px;right:14px;background:var(--green);color:white;border-radius:999px;padding:5px 8px;font:600 10px 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.05em}
+.chart-box{border-top:1px solid var(--line);padding-top:20px}.chart-title{display:flex;justify-content:space-between;gap:10px;align-items:end;margin-bottom:12px}.chart-title h3{font:700 16px 'Space Grotesk',sans-serif;margin:0}.chart-title span{color:var(--muted);font:400 10px 'IBM Plex Mono',monospace}.chart-inner{height:300px}
+.disclaimer{font:400 10px/1.6 'IBM Plex Mono',monospace;color:var(--muted);margin-top:18px}
+footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top:25px;font-family:'IBM Plex Mono',monospace}
 
-  .field-inline{margin-top:14px;}
-  .field-inline label{font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);display:block;margin-bottom:6px;}
+[hidden]{display:none!important}
+.progressive-section.section-revealed{animation:sectionReveal .48s cubic-bezier(.2,.7,.25,1) both}
+@keyframes sectionReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.progress div.is-complete{background:var(--green)}
+.progress div.is-current{background:#8fb8ac}
 
-  /* Results */
-  .results-strip{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:0;
-    background:var(--shell-2);
-  }
-  .result-card{
-    padding:22px 24px;
-    color:var(--paper);
-    position:relative;
-  }
-  .result-card + .result-card{border-left:1px dashed rgba(255,255,255,0.15);}
-  .result-card .label{
-    font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#9fb0aa;margin-bottom:8px;
-  }
-  .result-card .total{
-    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:30px;letter-spacing:-0.01em;
-  }
-  .result-card .sub{font-size:13px;color:#c7cfcb;margin-top:6px;line-height:1.5;}
-  .stamp{
-    position:absolute;top:16px;right:20px;
-    font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;
-    letter-spacing:0.08em;text-transform:uppercase;
-    color:var(--teal-bg);
-    border:1.5px solid #6fd6b8;
-    padding:4px 10px;border-radius:20px;
-    transform:rotate(4deg);
-  }
-
-  .verdict{
-    padding:18px 24px;
-    background:var(--paper);
-    border-top:1px dashed var(--line-strong);
-    font-family:'IBM Plex Mono',monospace;
-    font-size:14px;
-    color:var(--ink);
-    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-  }
-  .verdict b{color:var(--teal-ink);}
-
-  .chart-wrap{padding:24px;}
-  .chart-inner{position:relative;height:280px;}
-  .legend-row{display:flex;gap:18px;margin-bottom:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);flex-wrap:wrap;}
-  .legend-row span{display:flex;align-items:center;gap:6px;}
-  .legend-row i{width:10px;height:10px;border-radius:2px;display:inline-block;}
-
-  footer{
-    text-align:center;color:#8fa39c;font-size:12px;margin-top:24px;line-height:1.7;
-    font-family:'IBM Plex Mono',monospace;
-  }
-
-  @media (max-width: 720px){
-    .options{grid-template-columns:1fr;}
-    .divider{display:none;}
-    .results-strip{grid-template-columns:1fr;}
-    .result-card + .result-card{border-left:none;border-top:1px dashed rgba(255,255,255,0.15);}
-  }
+@media(max-width:800px){
+  .wrap{padding:30px 14px 54px}.panel-head,.panel-body{padding-left:17px;padding-right:17px}
+  .col-8,.col-6,.col-4,.col-3{grid-column:span 12}
+  .option-grid,.cost-cards,.insight-list{grid-template-columns:1fr}.plan-grid{grid-template-columns:1fr}.vs{margin:auto}.summary-grid{grid-template-columns:1fr 1fr}
+  .inline-action{align-items:stretch;flex-direction:column}.price-entry-row{grid-template-columns:1fr}.btn{width:100%}.hero{text-align:left}.hero-badges{justify-content:flex-start}.progress{display:none}
+}
+@media(max-width:470px){.summary-grid{grid-template-columns:1fr}.plan-fields{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}.option-card{padding:16px}.chart-inner{height:260px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <header>
-    <p class="eyebrow">phone cost calculator</p>
-    <h1>Buy it outright, or bill it monthly?</h1>
-    <p>Line up the sticker price against the contract, month by month, and see exactly where one gets cheaper than the other.</p>
+<main class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Phone deal comparator</p>
+    <h1>Which phone deal actually costs less?</h1>
+    <p>Compare buying the phone outright with your own SIM-only plan against a phone contract. See the real total cost, monthly average, break-even point, and what you get for the extra money.</p>
+    <div class="hero-badges">
+      <span class="hero-badge">Total cost</span><span class="hero-badge">Monthly average</span><span class="hero-badge">Plan quality</span><span class="hero-badge">Break-even</span>
+    </div>
   </header>
+  <div class="progress" aria-hidden="true"><div data-progress="1"></div><div data-progress="2"></div><div data-progress="3"></div><div data-progress="4"></div></div>
 
-  <div class="panel">
-    <div class="panel-head"><h2><span class="dot"></span>The basics</h2></div>
+  <section class="panel progressive-section" id="step1" aria-labelledby="phone-heading">
+    <div class="panel-head"><span class="step">1</span><div><h2 id="phone-heading">Choose the phone</h2><p>Select the phone first. The outright price stays editable so you can correct an automatically found price if needed.</p></div></div>
     <div class="panel-body">
-      <div class="shared-grid">
-        <div class="field">
-          <label for="phoneName">Phone</label>
-          <input type="text" id="phoneName" value="New phone" placeholder="e.g. Pixel 10 Pro">
-        </div>
-        <div class="field">
-          <label for="basicPlan">Your SIM / plan cost, per month</label>
-          <div class="suffix-wrap prefix-wrap">
-            <span>€</span>
-            <input type="number" id="basicPlan" value="15" min="0" step="0.01">
+      <div class="grid">
+        <div class="field col-4"><label for="brand">Brand</label><select id="brand"><option value="">Choose brand</option><option>Apple</option><option>Samsung</option><option>Google</option><option>OnePlus</option><option>Xiaomi</option><option>Nothing</option><option>Motorola</option><option value="Other">Other</option></select></div>
+        <div class="field col-4"><label for="model" id="modelLabel">Model</label><select id="model" disabled><option value="">Choose brand first</option></select><input type="text" id="modelCustom" placeholder="Type model name" autocomplete="off" hidden></div>
+        <div class="field col-4"><label for="storage">Storage</label><select id="storage" disabled><option value="">Choose model first</option></select></div>
+      </div>
+
+      <div class="grid" style="margin-top:18px">
+        <div class="col-12">
+          <div class="field price-field">
+            <label for="otpPrice">Best outright price</label>
+            <div class="price-entry-row">
+              <div class="money"><span>€</span><input type="number" id="otpPrice" value="" placeholder="e.g. 899" min="0" step="0.01" inputmode="decimal"></div>
+              <button class="btn btn-secondary" id="lookupPrice" type="button">↗ Check price</button>
+            </div>
+            <span class="hint">Use the lowest realistic delivered price for the exact storage/version.</span>
           </div>
+          <div class="price-status" id="priceStatus"><span class="status-dot"></span><span>Select a phone, then use <strong>Check price</strong>. Automatic lookup is prepared for a backend endpoint; if unavailable, the button opens an idealo search.</span></div>
         </div>
       </div>
 
-      <div class="slider-row">
-        <label>Compare over <b id="compareMonthsLabel">36 months</b></label>
-        <input type="range" id="compareMonths" min="6" max="60" value="36" step="1">
+      <div class="range-box">
+        <div class="range-top"><span>Comparison period</span><strong id="compareMonthsLabel">24 months</strong></div>
+        <input type="range" id="compareMonths" min="6" max="60" value="24" step="1" aria-label="Comparison period in months">
+        <div class="range-scale"><span>6 mo</span><span>24 mo</span><span>36 mo</span><span>60 mo</span></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="panel">
-    <div class="panel-head"><h2><span class="dot" style="background:var(--amber)"></span>The two options</h2></div>
-    <div class="options">
-
-      <div class="option">
-        <div class="head"><span class="tag teal">option A</span></div>
-        <h3>Buy it outright</h3>
-        <div class="field-inline">
-          <label for="otpPrice">Phone price, paid once</label>
-          <div class="suffix-wrap prefix-wrap">
-            <span>€</span>
-            <input type="number" id="otpPrice" value="899" min="0" step="0.01">
-          </div>
+  <section class="panel progressive-section" id="step2" aria-labelledby="cost-heading" hidden>
+    <div class="panel-head"><span class="step">2</span><div><h2 id="cost-heading">Enter the two ways you could pay</h2><p>Option A is the phone bought outright plus your SIM-only plan. Option B is the phone contract you are considering.</p></div></div>
+    <div class="panel-body">
+      <div class="option-grid">
+        <div class="option-card a">
+          <div class="option-title"><div><span class="tag tag-a">Option A</span><h3>Buy phone outright</h3></div></div>
+          <div class="field"><label for="basicPlan">SIM-only plan per month</label><div class="money"><span>€</span><input type="number" id="basicPlan" value="" placeholder="e.g. 15" min="0" step="0.01" inputmode="decimal"></div><span class="hint">What you would pay each month if you own the phone yourself.</span></div>
+          <div class="row-toggle"><label class="switch"><input type="checkbox" id="hasBonusA"><span></span></label><label for="hasBonusA">I get trade-in / cashback</label></div>
+          <div class="reveal" id="bonusFieldA"><div class="field"><label for="bonusAmountA">Trade-in / cashback value</label><div class="money"><span>€</span><input type="number" id="bonusAmountA" value="0" min="0" step="0.01"></div></div></div>
+          <div class="info-callout">Upfront cost = phone price minus any trade-in/cashback. After that, you only pay your SIM plan.</div>
         </div>
 
-        <div class="toggle-row">
-          <label class="switch">
-            <input type="checkbox" id="hasBonusA">
-            <span class="slider-tog"></span>
-          </label>
-          <label for="hasBonusA">Trade-in or cashback bonus</label>
-        </div>
-        <div class="field-inline" id="bonusFieldA" style="display:none;">
-          <label for="bonusAmountA">Bonus amount</label>
-          <div class="suffix-wrap prefix-wrap">
-            <span>€</span>
-            <input type="number" id="bonusAmountA" value="0" min="0" step="0.01">
-          </div>
-        </div>
-
-        <div class="field-inline">
-          <label>Then, every month</label>
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--muted);">
-            Just your plan cost — nothing owed on the phone.
-          </div>
-        </div>
-      </div>
-
-      <div class="divider"><div class="notch top"></div><div class="notch bottom"></div></div>
-
-      <div class="option">
-        <div class="head"><span class="tag amber">option B</span></div>
-        <h3>Bill it on contract</h3>
-
-        <div class="toggle-row">
-          <label class="switch">
-            <input type="checkbox" id="hasUpfront">
-            <span class="slider-tog"></span>
-          </label>
-          <label for="hasUpfront">Upfront payment required</label>
-        </div>
-        <div class="field-inline" id="upfrontField" style="display:none;">
-          <label for="upfrontAmount">Upfront amount</label>
-          <div class="suffix-wrap prefix-wrap">
-            <span>€</span>
-            <input type="number" id="upfrontAmount" value="0" min="0" step="0.01">
-          </div>
-        </div>
-
-        <div class="toggle-row">
-          <label class="switch">
-            <input type="checkbox" id="hasBonusB">
-            <span class="slider-tog"></span>
-          </label>
-          <label for="hasBonusB">Carrier bonus or gift card</label>
-        </div>
-        <div class="field-inline" id="bonusFieldB" style="display:none;">
-          <label for="bonusAmountB">Bonus amount</label>
-          <div class="suffix-wrap prefix-wrap">
-            <span>€</span>
-            <input type="number" id="bonusAmountB" value="0" min="0" step="0.01">
-          </div>
-        </div>
-
-        <div class="field-inline">
-          <label for="monthlyPayment">Monthly payment</label>
-          <div class="suffix-wrap prefix-wrap">
-            <span>€</span>
-            <input type="number" id="monthlyPayment" value="32" min="0" step="0.01">
-          </div>
-        </div>
-        <div class="field-inline">
-          <label for="contractMonths">Contract length, months</label>
-          <input type="number" id="contractMonths" value="24" min="1" step="1">
-        </div>
-
-        <div class="toggle-row" style="margin-top:16px;">
-          <label class="switch">
-            <input type="checkbox" id="includesPlan" checked>
-            <span class="slider-tog"></span>
-          </label>
-          <label for="includesPlan">Monthly payment already includes my plan</label>
+        <div class="option-card b">
+          <div class="option-title"><div><span class="tag tag-b">Option B</span><h3>Take the phone contract</h3></div></div>
+          <div class="field"><label for="monthlyPayment">Contract payment per month</label><div class="money"><span>€</span><input type="number" id="monthlyPayment" value="" placeholder="e.g. 32" min="0" step="0.01" inputmode="decimal"></div><span class="hint">Enter the amount shown on the provider's offer.</span></div>
+          <div class="field"><label for="contractMonths">Contract duration</label><div class="suffix"><input type="number" id="contractMonths" value="" placeholder="e.g. 24" min="1" max="60" step="1"><span>months</span></div></div>
+          <div class="field" style="margin-top:15px"><span class="field-label">What does that monthly payment include?</span><div class="segmented"><input type="radio" name="paymentIncludes" id="paymentIncludesPlan" value="yes" checked><label for="paymentIncludesPlan">Phone + plan</label><input type="radio" name="paymentIncludes" id="paymentPhoneOnly" value="no"><label for="paymentPhoneOnly">Phone only</label></div></div>
+          <div class="row-toggle"><label class="switch"><input type="checkbox" id="hasUpfront"><span></span></label><label for="hasUpfront">There is an upfront payment</label></div>
+          <div class="reveal" id="upfrontField"><div class="field"><label for="upfrontAmount">Upfront payment</label><div class="money"><span>€</span><input type="number" id="upfrontAmount" value="0" min="0" step="0.01"></div></div></div>
+          <div class="row-toggle"><label class="switch"><input type="checkbox" id="hasBonusB"><span></span></label><label for="hasBonusB">Contract includes joining bonus / cashback</label></div>
+          <div class="reveal" id="bonusFieldB"><div class="field"><label for="bonusAmountB">Joining bonus / cashback value</label><div class="money"><span>€</span><input type="number" id="bonusAmountB" value="0" min="0" step="0.01"></div></div></div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="panel">
-    <div class="panel-head"><h2><span class="dot" style="background:var(--amber)"></span>Compare the plans</h2></div>
-    <div class="options">
-
-      <div class="option">
-        <div class="head"><span class="tag teal">plan A</span></div>
-        <h3>Your plan</h3>
-        <div class="field-inline">
-          <label for="dataA">Data allowance</label>
-          <div class="suffix-wrap">
-            <input type="number" id="dataA" value="20" min="0" step="0.1">
-            <span>GB</span>
-          </div>
-        </div>
-        <div class="toggle-row">
-          <label class="switch">
-            <input type="checkbox" id="unlimitedA">
-            <span class="slider-tog"></span>
-          </label>
-          <label for="unlimitedA">Unlimited data</label>
-        </div>
-        <div class="field-inline">
-          <label for="speedA">Speed</label>
-          <div class="suffix-wrap">
-            <input type="number" id="speedA" value="150" min="0" step="0.1">
-            <span>Mbps</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="divider"><div class="notch top"></div><div class="notch bottom"></div></div>
-
-      <div class="option">
-        <div class="head"><span class="tag amber">plan B</span></div>
-        <h3>Contract's plan</h3>
-        <div class="field-inline">
-          <label for="dataB">Data allowance</label>
-          <div class="suffix-wrap">
-            <input type="number" id="dataB" value="50" min="0" step="0.1">
-            <span>GB</span>
-          </div>
-        </div>
-        <div class="toggle-row">
-          <label class="switch">
-            <input type="checkbox" id="unlimitedB">
-            <span class="slider-tog"></span>
-          </label>
-          <label for="unlimitedB">Unlimited data</label>
-        </div>
-        <div class="field-inline">
-          <label for="speedB">Speed</label>
-          <div class="suffix-wrap">
-            <input type="number" id="speedB" value="300" min="0" step="0.1">
-            <span>Mbps</span>
-          </div>
-        </div>
+  <section class="panel progressive-section" id="step3" aria-labelledby="plan-heading" hidden>
+    <div class="panel-head"><span class="step">3</span><div><h2 id="plan-heading">Compare what the mobile plans include</h2><p>Cost is only half the decision. Add the data and speed so the summary can explain what you gain or give up.</p></div></div>
+    <div class="panel-body">
+      <div class="plan-grid">
+        <div class="plan-card"><h3>Your SIM-only plan</h3><div class="plan-fields"><div class="field"><label for="dataA">Data</label><div class="suffix"><input type="number" id="dataA" value="" placeholder="e.g. 20" min="0" step="0.1"><span>GB</span></div></div><div class="field"><label for="speedA">Max speed</label><div class="suffix"><input type="number" id="speedA" value="" placeholder="e.g. 150" min="0" step="1"><span>Mbps</span></div></div></div><div class="row-toggle"><label class="switch"><input type="checkbox" id="unlimitedA"><span></span></label><label for="unlimitedA">Unlimited data</label></div></div>
+        <div class="vs">VS</div>
+        <div class="plan-card"><h3>Contract plan</h3><div class="plan-fields"><div class="field"><label for="dataB">Data</label><div class="suffix"><input type="number" id="dataB" value="" placeholder="e.g. 50" min="0" step="0.1"><span>GB</span></div></div><div class="field"><label for="speedB">Max speed</label><div class="suffix"><input type="number" id="speedB" value="" placeholder="e.g. 300" min="0" step="1"><span>Mbps</span></div></div></div><div class="row-toggle"><label class="switch"><input type="checkbox" id="unlimitedB"><span></span></label><label for="unlimitedB">Unlimited data</label></div></div>
       </div>
     </div>
-    <div class="verdict" id="planVerdict"></div>
-  </div>
+  </section>
 
-  <div class="panel">
-    <div class="panel-head"><h2><span class="dot"></span>The tally</h2></div>
-    <div class="results-strip">
-      <div class="result-card" id="cardA">
-        <div class="label">Buy it outright — total after <span id="monthsA">36</span> months</div>
-        <div class="total" id="totalA">€0</div>
-        <div class="sub" id="subA"></div>
-      </div>
-      <div class="result-card" id="cardB">
-        <div class="label">Bill it on contract — total after <span id="monthsB">36</span> months</div>
-        <div class="total" id="totalB">€0</div>
-        <div class="sub" id="subB"></div>
+  <section class="panel progressive-section" id="step4" aria-labelledby="result-heading" hidden>
+    <div class="panel-head"><span class="step">4</span><div><h2 id="result-heading">Your comparison summary</h2><p>The result combines price, cash-flow and plan differences so you can see why one option is stronger for you.</p></div></div>
+    <div class="results-hero">
+      <div class="result-kicker">Bottom line</div>
+      <h3 class="result-title" id="resultTitle">Calculating…</h3>
+      <div class="result-lead" id="resultLead"></div>
+      <div class="summary-grid">
+        <div class="summary-card"><div class="k">Savings</div><div class="v" id="savingMetric">—</div><div class="s" id="savingSub"></div></div>
+        <div class="summary-card"><div class="k">Outright avg / month</div><div class="v" id="avgA">—</div><div class="s">Across the selected period</div></div>
+        <div class="summary-card"><div class="k">Contract avg / month</div><div class="v" id="avgB">—</div><div class="s">Across the selected period</div></div>
+        <div class="summary-card"><div class="k">Break-even</div><div class="v" id="breakEvenMetric">—</div><div class="s" id="breakEvenSub"></div></div>
       </div>
     </div>
-    <div class="verdict" id="verdict"></div>
-
-    <div class="chart-wrap">
-      <div class="legend-row">
-        <span><i style="background:#0f6e56"></i>Buy it outright</span>
-        <span><i style="background:#c4780e"></i>Bill it on contract</span>
-      </div>
-      <div class="chart-inner">
-        <canvas id="costChart" role="img" aria-label="Line chart comparing cumulative cost of buying a phone outright versus paying on contract, month by month"></canvas>
-      </div>
+    <div class="comparison-body">
+      <ul class="insight-list" id="insightList"></ul>
+      <div class="cost-cards"><div class="cost-card" id="cardA"><div class="label">Buy outright + SIM-only</div><div class="total" id="totalA">€0</div><div class="sub" id="subA"></div></div><div class="cost-card" id="cardB"><div class="label">Phone contract</div><div class="total" id="totalB">€0</div><div class="sub" id="subB"></div></div></div>
+      <div class="chart-box"><div class="chart-title"><div><h3>Cumulative cost over time</h3><span>Hover / tap the chart to compare each month.</span></div></div><div class="chart-inner"><canvas id="costChart" role="img" aria-label="Cumulative cost comparison of buying a phone outright versus a phone contract"></canvas></div></div>
+      <div class="disclaimer">Assumption: once the phone contract ends, you switch to the SIM-only monthly price entered in Option A. Joining bonuses, cashback and trade-in values are treated as full credits against the overall option cost, not as a cap on the upfront payment. This is a planning estimate; check the provider's exact contract, price rises, eligibility and cancellation terms.</div>
     </div>
-  </div>
+  </section>
 
-  <footer>
-    Assumes your plan cost stays flat over the period, and that after a contract ends you go back to paying just your plan.<br>
-    This is a planning estimate, not financial advice — check the exact terms with your carrier.
-  </footer>
-</div>
-
+  <footer>Built to compare the real cost of a phone, not just the advertised monthly number.</footer>
+</main>
 <script>
-(function(){
+(() => {
   const $ = id => document.getElementById(id);
-  const fmt = n => '€' + Math.round(n).toLocaleString('en-US');
-  const fmt2 = n => '€' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const money = n => new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
+  const money2 = n => new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
+  const moneyExact = n => {
+    const value = Number.isFinite(n) ? n : 0;
+    const hasCents = Math.abs(value - Math.round(value)) > 0.0001;
+    return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',minimumFractionDigits:hasCents?2:0,maximumFractionDigits:2}).format(value);
+  };
+  const val = id => Math.max(0, parseFloat($(id).value) || 0);
 
-  function wireToggle(checkboxId, fieldId){
-    const cb = $(checkboxId);
-    const field = $(fieldId);
-    cb.addEventListener('change', () => {
-      field.style.display = cb.checked ? 'block' : 'none';
-      update();
+  const catalogue = {
+    Apple: {'iPhone 17':['256 GB','512 GB'], 'iPhone 17 Pro':['256 GB','512 GB','1 TB'], 'iPhone 17 Pro Max':['256 GB','512 GB','1 TB'], 'iPhone Air':['256 GB','512 GB','1 TB'], 'iPhone 17e':['128 GB','256 GB','512 GB'], 'iPhone 16':['128 GB','256 GB','512 GB']},
+    Samsung: {'Galaxy S26':['128 GB','256 GB','512 GB'], 'Galaxy S26+':['256 GB','512 GB'], 'Galaxy S26 Ultra':['256 GB','512 GB','1 TB'], 'Galaxy Z Flip7':['256 GB','512 GB'], 'Galaxy Z Fold7':['256 GB','512 GB','1 TB'], 'Galaxy A56':['128 GB','256 GB']},
+    Google: {'Pixel 10':['128 GB','256 GB'], 'Pixel 10 Pro':['128 GB','256 GB','512 GB','1 TB'], 'Pixel 10 Pro XL':['256 GB','512 GB','1 TB'], 'Pixel 10 Pro Fold':['256 GB','512 GB'], 'Pixel 9a':['128 GB','256 GB']},
+    OnePlus: {'OnePlus 15':['256 GB','512 GB'], 'OnePlus 13':['256 GB','512 GB'], 'OnePlus 13R':['256 GB'], 'Nord 5':['256 GB','512 GB']},
+    Xiaomi: {'Xiaomi 16':['256 GB','512 GB'], 'Xiaomi 16 Pro':['256 GB','512 GB','1 TB'], 'Xiaomi 15':['256 GB','512 GB'], 'Redmi Note 15 Pro':['256 GB','512 GB']},
+    Nothing: {'Phone (3)':['256 GB','512 GB'], 'Phone (3a)':['128 GB','256 GB'], 'Phone (3a) Pro':['256 GB']},
+    Motorola: {'Edge 60 Pro':['256 GB','512 GB'], 'Razr 60 Ultra':['512 GB'], 'Moto G86':['256 GB']},
+    Other: {}
+  };
+
+  function getModelValue(){
+    return $('brand').value === 'Other' ? $('modelCustom').value.trim() : $('model').value;
+  }
+  function populateModels(){
+    const brand=$('brand').value, model=$('model'), custom=$('modelCustom'), storage=$('storage');
+    model.innerHTML=''; custom.value=''; storage.innerHTML='<option value="">Choose model first</option>'; storage.disabled=true;
+    if(!brand){
+      model.hidden=false; custom.hidden=true; $('modelLabel').htmlFor='model'; model.innerHTML='<option value="">Choose brand first</option>'; model.disabled=true;
+      updatePriceStatus(); syncProgress(); return;
+    }
+    if(brand==='Other'){
+      model.hidden=true; model.disabled=true; custom.hidden=false; $('modelLabel').htmlFor='modelCustom';
+      storage.innerHTML='<option value="">Choose storage</option>';
+      ['64 GB','128 GB','256 GB','512 GB','1 TB','Not sure'].forEach(x=>storage.add(new Option(x,x)));
+      storage.disabled=false; custom.focus();
+    }else{
+      custom.hidden=true; model.hidden=false; $('modelLabel').htmlFor='model'; model.disabled=false; model.insertAdjacentHTML('beforeend','<option value="">Choose model</option>');
+      Object.keys(catalogue[brand]||{}).forEach(m=>model.add(new Option(m,m)));
+    }
+    updatePriceStatus(); syncProgress();
+  }
+  function populateStorage(){
+    const brand=$('brand').value, model=getModelValue(), storage=$('storage');
+    if(brand==='Other'){ syncProgress(); return; }
+    storage.innerHTML='';
+    if(!brand||!model){storage.innerHTML='<option value="">Choose model first</option>';storage.disabled=true;updatePriceStatus();syncProgress();return}
+    storage.disabled=false; storage.add(new Option('Choose storage',''));
+    (catalogue[brand]?.[model]||[]).forEach(s=>storage.add(new Option(s,s)));
+    updatePriceStatus(); syncProgress();
+  }
+  function selectedPhone(){ return [$('brand').value,getModelValue(),$('storage').value].filter(Boolean).join(' '); }
+  function updatePriceStatus(text,kind){ const el=$('priceStatus'); el.className='price-status'+(kind?' '+kind:''); el.querySelector('span:last-child').innerHTML=text||'Select a phone, then use <strong>Check price</strong>. Automatic lookup is prepared for a backend endpoint; if unavailable, the button opens an idealo search.'; }
+
+  async function lookupPhonePrice(){
+    const q=selectedPhone(); if(!$('brand').value||!getModelValue()){updatePriceStatus('Choose a brand and model first.','warn');return}
+    updatePriceStatus('Looking for a current outright price…','');
+    try{
+      const params=new URLSearchParams({brand:$('brand').value,model:getModelValue(),storage:$('storage').value});
+      const r=await fetch('/api/phone-price?'+params.toString(),{headers:{'Accept':'application/json'}});
+      if(!r.ok) throw new Error('No backend price service');
+      const d=await r.json();
+      if(typeof d.price!=='number') throw new Error('Invalid price result');
+      $('otpPrice').value=d.price.toFixed(2); update(); syncProgress();
+      const source=d.source||'price service';
+      updatePriceStatus(`Found <strong>${money2(d.price)}</strong> via ${source}. Please verify the exact storage, colour and shipping before buying. <a href="${d.url||'#'}" target="_blank" rel="noopener">View offer ↗</a>`,'ok');
+    }catch(e){
+      const query=encodeURIComponent(q);
+      const url='https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q='+query;
+      updatePriceStatus(`A direct automatic price feed is not connected yet. <a href="${url}" target="_blank" rel="noopener">Open ${q} on idealo.de ↗</a>, then paste the best delivered price here. The page is already prepared for a future <code>/api/phone-price</code> endpoint.`,'warn');
+      window.open(url,'_blank','noopener');
+    }
+  }
+
+  function wireReveal(checkId,boxId){ const c=$(checkId),b=$(boxId); const sync=()=>{b.classList.toggle('show',c.checked);update()}; c.addEventListener('change',sync);sync(); }
+  function wireUnlimited(checkId,inputId){ const c=$(checkId),i=$(inputId); const sync=()=>{i.disabled=c.checked;update()};c.addEventListener('change',sync);sync(); }
+
+  const hasValue = id => $(id).value.trim() !== '';
+  function step1Complete(){
+    return Boolean($('brand').value && getModelValue() && $('storage').value && hasValue('otpPrice') && val('otpPrice') > 0);
+  }
+  function step2Complete(){
+    if(!hasValue('basicPlan') || !hasValue('monthlyPayment') || !hasValue('contractMonths')) return false;
+    if(parseInt($('contractMonths').value,10) < 1) return false;
+    if($('hasBonusA').checked && !hasValue('bonusAmountA')) return false;
+    if($('hasUpfront').checked && !hasValue('upfrontAmount')) return false;
+    if($('hasBonusB').checked && !hasValue('bonusAmountB')) return false;
+    return true;
+  }
+  function step3Complete(){
+    const dataAOk=$('unlimitedA').checked || (hasValue('dataA') && val('dataA')>0);
+    const dataBOk=$('unlimitedB').checked || (hasValue('dataB') && val('dataB')>0);
+    return dataAOk && dataBOk && hasValue('speedA') && val('speedA')>0 && hasValue('speedB') && val('speedB')>0;
+  }
+  function revealStep(id,scroll=true){
+    const el=$(id);
+    if(!el.hidden) return false;
+    el.hidden=false; el.classList.remove('section-revealed'); void el.offsetWidth; el.classList.add('section-revealed');
+    if(scroll) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),190);
+    if(id==='step4') setTimeout(()=>{ update(); if(chart) chart.resize(); },260);
+    return true;
+  }
+  function hideStep(id){
+    const el=$(id); if(el.hidden) return; el.hidden=true; el.classList.remove('section-revealed');
+  }
+  function updateProgressIndicator(){
+    const states=[true,step1Complete(),step1Complete()&&step2Complete(),step1Complete()&&step2Complete()&&step3Complete()];
+    document.querySelectorAll('.progress [data-progress]').forEach((bar,i)=>{
+      bar.classList.toggle('is-complete',states[i]);
+      bar.classList.toggle('is-current',!states[i] && (i===0 || states[i-1]));
     });
   }
-  wireToggle('hasUpfront', 'upfrontField');
-  wireToggle('hasBonusA', 'bonusFieldA');
-  wireToggle('hasBonusB', 'bonusFieldB');
+  function syncProgress(scroll=true){
+    const one=step1Complete();
+    if(!one){ hideStep('step2');hideStep('step3');hideStep('step4');updateProgressIndicator();return; }
+    revealStep('step2',scroll);
+    const two=step2Complete();
+    if(!two){ hideStep('step3');hideStep('step4');updateProgressIndicator();return; }
+    revealStep('step3',scroll);
+    const three=step3Complete();
+    if(!three){ hideStep('step4');updateProgressIndicator();return; }
+    revealStep('step4',scroll);
+    updateProgressIndicator();
+  }
 
-  $('compareMonths').addEventListener('input', () => {
-    $('compareMonthsLabel').textContent = $('compareMonths').value + ' months';
-    update();
-  });
-
-  const inputs = [
-    'phoneName','basicPlan','otpPrice','upfrontAmount','monthlyPayment','contractMonths','includesPlan',
-    'bonusAmountA','bonusAmountB','dataA','speedA','dataB','speedB','unlimitedA','unlimitedB'
-  ];
-  inputs.forEach(id => $(id).addEventListener('input', update));
+  function compute(months){
+    const plan=val('basicPlan'), phone=val('otpPrice'), monthly=val('monthlyPayment'), duration=Math.max(1,parseInt($('contractMonths').value)||1);
+    const includesPlan=$('paymentIncludesPlan').checked, upfront=$('hasUpfront').checked?val('upfrontAmount'):0, bonusA=$('hasBonusA').checked?val('bonusAmountA'):0, bonusB=$('hasBonusB').checked?val('bonusAmountB'):0;
+    let a=0,b=0; const seriesA=[],seriesB=[];
+    for(let m=1;m<=months;m++){
+      if(m===1){ a+=phone; a-=bonusA; } a+=plan; seriesA.push(a);
+      if(m===1){ b+=upfront; b-=bonusB; }
+      if(m<=duration){b+=monthly;if(!includesPlan)b+=plan}else b+=plan;
+      seriesB.push(b);
+    }
+    return {plan,phone,monthly,duration,includesPlan,upfront,bonusA,bonusB,seriesA,seriesB,totalA:seriesA.at(-1)||0,totalB:seriesB.at(-1)||0};
+  }
+  function findCrossing(a,b){
+    let prev=a[0]-b[0];
+    for(let i=1;i<a.length;i++){const cur=a[i]-b[i]; if(cur===0||prev===0||(prev<0&&cur>0)||(prev>0&&cur<0)) return i+1; prev=cur} return null;
+  }
+  function planText(unlimited,data){return unlimited?'unlimited data':`${data} GB`}
+  function makeInsights(d,months){
+    const ua=$('unlimitedA').checked,ub=$('unlimitedB').checked,da=val('dataA'),db=val('dataB'),sa=val('speedA'),sb=val('speedB');
+    const items=[];
+    const checkoutA=d.phone, checkoutB=d.upfront;
+    const upfrontDiff=Math.abs(checkoutA-checkoutB);
+    if(checkoutA>checkoutB)items.push(`<strong>Lower day-one cost:</strong> the contract needs ${moneyExact(upfrontDiff)} less cash at checkout.`); else if(checkoutB>checkoutA)items.push(`<strong>Lower day-one cost:</strong> buying outright needs ${moneyExact(upfrontDiff)} less cash at checkout.`); else items.push('<strong>Upfront cash:</strong> both options require roughly the same cash at checkout.');
+    if(d.bonusB>0)items.push(`<strong>Contract incentive:</strong> the ${moneyExact(d.bonusB)} joining bonus / cashback is deducted from the contract's total cost.`);
+    else if(d.bonusA>0)items.push(`<strong>Outright incentive:</strong> the ${moneyExact(d.bonusA)} trade-in / cashback is deducted from the outright option's total cost.`);
+    if(ua!==ub){items.push(`<strong>Data:</strong> ${ub?'the contract':'your SIM-only plan'} includes unlimited data, while ${ub?'your SIM-only plan': 'the contract'} has ${ub?da:db} GB.`)} else if(!ua&&!ub&&da!==db){const diff=Math.abs(db-da);items.push(`<strong>Data:</strong> ${db>da?'the contract':'your SIM-only plan'} gives ${diff} GB more data each month.`)} else items.push(`<strong>Data:</strong> both plans offer ${planText(ua,da)}.`);
+    if(sa&&sb&&sa!==sb){const faster=sb>sa?'the contract':'your SIM-only plan'; const ratio=Math.max(sa,sb)/Math.min(sa,sb);items.push(`<strong>Speed:</strong> ${faster} is up to ${ratio>=1.95?ratio.toFixed(1)+'×':Math.abs(sb-sa)+' Mbps'} ${ratio>=1.95?'faster':'higher'} on the stated maximum speed.`)} else if(sa===sb)items.push(`<strong>Speed:</strong> both plans list the same ${sa} Mbps maximum speed.`);
+    const diff=Math.abs(d.totalA-d.totalB); const expensive=d.totalA>d.totalB?'buying outright':'the contract'; const betterPlan=(ub&&!ua)||(!ua&&!ub&&db>da)||(sb>sa); if(diff>0&&betterPlan&&expensive==='the contract'){items.push(`<strong>What the extra money buys:</strong> the contract costs ${moneyExact(diff)} more over ${months} months, but it also gives the stronger plan on the details entered.`)}
+    return items.slice(0,4);
+  }
 
   let chart;
-
-  function computeSeries(months){
-    const basicPlan = parseFloat($('basicPlan').value) || 0;
-    const otpPrice = parseFloat($('otpPrice').value) || 0;
-    const hasUpfront = $('hasUpfront').checked;
-    const upfrontAmount = hasUpfront ? (parseFloat($('upfrontAmount').value) || 0) : 0;
-    const monthlyPayment = parseFloat($('monthlyPayment').value) || 0;
-    const contractMonths = Math.max(1, parseInt($('contractMonths').value) || 1);
-    const includesPlan = $('includesPlan').checked;
-    const hasBonusA = $('hasBonusA').checked;
-    const bonusA = hasBonusA ? (parseFloat($('bonusAmountA').value) || 0) : 0;
-    const hasBonusB = $('hasBonusB').checked;
-    const bonusB = hasBonusB ? (parseFloat($('bonusAmountB').value) || 0) : 0;
-
-    const seriesA = [];
-    const seriesB = [];
-    let runningA = 0;
-    let runningB = 0;
-
-    for (let m = 1; m <= months; m++){
-      if (m === 1) runningA += otpPrice - bonusA;
-      runningA += basicPlan;
-      seriesA.push(runningA);
-
-      if (m === 1) runningB += upfrontAmount - bonusB;
-      if (m <= contractMonths){
-        runningB += monthlyPayment;
-        if (!includesPlan) runningB += basicPlan;
-      } else {
-        runningB += basicPlan;
-      }
-      seriesB.push(runningB);
-    }
-    return { seriesA, seriesB, basicPlan, otpPrice, hasUpfront, upfrontAmount, monthlyPayment, contractMonths, includesPlan, bonusA, bonusB };
-  }
-
-  function findBreakeven(seriesA, seriesB){
-    for (let i = 1; i < seriesA.length; i++){
-      const prevDiff = seriesA[i-1] - seriesB[i-1];
-      const diff = seriesA[i] - seriesB[i];
-      if (prevDiff === 0) return i;
-      if ((prevDiff < 0 && diff >= 0) || (prevDiff > 0 && diff <= 0)) return i + 1;
-    }
-    return null;
-  }
-
-  function wireUnlimited(checkboxId, dataFieldId){
-    const cb = $(checkboxId);
-    const dataInput = $(dataFieldId);
-    cb.addEventListener('change', () => {
-      dataInput.disabled = cb.checked;
-      dataInput.style.opacity = cb.checked ? 0.4 : 1;
-      update();
-    });
-  }
-  wireUnlimited('unlimitedA', 'dataA');
-  wireUnlimited('unlimitedB', 'dataB');
-
-  function planLabel(unlimited, data, speed){
-    const dataPart = unlimited ? 'Unlimited data' : `${data} GB`;
-    return `${dataPart} at ${speed} Mbps`;
-  }
-
-  function updatePlanVerdict(data){
-    const unlimitedA = $('unlimitedA').checked;
-    const unlimitedB = $('unlimitedB').checked;
-    const dataA = parseFloat($('dataA').value) || 0;
-    const dataB = parseFloat($('dataB').value) || 0;
-    const speedA = parseFloat($('speedA').value) || 0;
-    const speedB = parseFloat($('speedB').value) || 0;
-
-    let html = `<b>Plan A</b>&nbsp;${planLabel(unlimitedA, dataA, speedA)} &nbsp;·&nbsp; <b>Plan B</b>&nbsp;${planLabel(unlimitedB, dataB, speedB)}`;
-
-    if (!unlimitedA && !unlimitedB && dataA > 0 && dataB > 0 && data.basicPlan > 0){
-      const perGbA = data.basicPlan / dataA;
-      const perGbB = (data.includesPlan ? data.monthlyPayment : data.basicPlan) / dataB;
-      html += `<br><span style="color:var(--muted);">≈ ${fmt2(perGbA)} per GB on plan A vs ≈ ${fmt2(perGbB)} per GB on plan B.</span>`;
-    }
-    $('planVerdict').innerHTML = html;
-  }
-
   function update(){
-    const months = parseInt($('compareMonths').value) || 36;
-    const data = computeSeries(months);
-    const { seriesA, seriesB } = data;
-    const totalA = seriesA[seriesA.length - 1];
-    const totalB = seriesB[seriesB.length - 1];
-
-    $('monthsA').textContent = months;
-    $('monthsB').textContent = months;
-    $('totalA').textContent = fmt(totalA);
-    $('totalB').textContent = fmt(totalB);
-
-    let subA = `${fmt(data.otpPrice)} upfront`;
-    if (data.bonusA > 0) subA += ` − ${fmt(data.bonusA)} bonus`;
-    subA += ` + ${fmt(data.basicPlan)}/mo plan`;
-    $('subA').textContent = subA;
-
-    let subB = '';
-    if (data.hasUpfront) subB += `${fmt(data.upfrontAmount)} upfront`;
-    if (data.bonusB > 0) subB += `${data.hasUpfront ? ' − ' : '−'}${fmt(data.bonusB)} bonus`;
-    if (subB) subB += ' + ';
-    subB += `${fmt(data.monthlyPayment)}/mo for ${data.contractMonths} mo`;
-    if (!data.includesPlan) subB += ` + ${fmt(data.basicPlan)}/mo plan`;
-    $('subB').textContent = subB;
-
-    document.getElementById('cardA').querySelector('.stamp')?.remove();
-    document.getElementById('cardB').querySelector('.stamp')?.remove();
-
-    const verdictEl = $('verdict');
-    const diff = Math.abs(totalA - totalB);
-    if (totalA < totalB){
-      $('cardA').insertAdjacentHTML('beforeend', '<div class="stamp">cheaper</div>');
-      verdictEl.innerHTML = `Buying outright saves you <b>${fmt(diff)}</b> over ${months} months.`;
-    } else if (totalB < totalA){
-      $('cardB').insertAdjacentHTML('beforeend', '<div class="stamp">cheaper</div>');
-      verdictEl.innerHTML = `The contract saves you <b>${fmt(diff)}</b> over ${months} months.`;
-    } else {
-      verdictEl.innerHTML = `Both options cost exactly the same over ${months} months.`;
-    }
-
-    const breakeven = findBreakeven(seriesA, seriesB);
-    if (breakeven && breakeven < months){
-      verdictEl.innerHTML += ` <span style="color:var(--muted);">The cheaper option flips around month ${breakeven}.</span>`;
-    }
-
-    updatePlanVerdict(data);
-
-    const labels = seriesA.map((_, i) => 'M' + (i + 1));
-
-    if (chart){
-      chart.data.labels = labels;
-      chart.data.datasets[0].data = seriesA;
-      chart.data.datasets[1].data = seriesB;
-      chart.update();
-    } else {
-      const ctx = document.getElementById('costChart');
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Buy it outright',
-              data: seriesA,
-              borderColor: '#0f6e56',
-              backgroundColor: 'rgba(15,110,86,0.08)',
-              borderWidth: 2,
-              pointRadius: 0,
-              tension: 0,
-              fill: false
-            },
-            {
-              label: 'Bill it on contract',
-              data: seriesB,
-              borderColor: '#c4780e',
-              backgroundColor: 'rgba(196,120,14,0.08)',
-              borderWidth: 2,
-              borderDash: [5,3],
-              pointRadius: 0,
-              tension: 0,
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { autoSkip: true, maxTicksLimit: 12, color: '#8b8a82' },
-              grid: { display: false }
-            },
-            y: {
-              ticks: {
-                color: '#8b8a82',
-                callback: v => '€' + v.toLocaleString('en-US')
-              },
-              grid: { color: '#e5e2d8' }
-            }
-          }
-        }
-      });
+    let months=Math.min(60,Math.max(6,parseInt($('compareMonths').value)||24)); $('compareMonthsLabel').textContent=`${months} months`;
+    const d=compute(months), diff=Math.abs(d.totalA-d.totalB), aWins=d.totalA<d.totalB, bWins=d.totalB<d.totalA, crossing=findCrossing(d.seriesA,d.seriesB);
+    $('totalA').textContent=moneyExact(d.totalA); $('totalB').textContent=moneyExact(d.totalB); $('avgA').textContent=money2(d.totalA/months); $('avgB').textContent=money2(d.totalB/months);
+    let subA=`${moneyExact(d.phone)} phone + ${money2(d.plan)}/month SIM plan`;
+    if(d.bonusA>0) subA+=` − ${moneyExact(d.bonusA)} trade-in / cashback`;
+    $('subA').textContent=subA;
+    let subB=`${moneyExact(d.upfront)} upfront + ${money2(d.monthly)}/month for ${d.duration} months${d.includesPlan?' (plan included)':' + SIM plan'}`;
+    if(d.bonusB>0) subB+=` − ${moneyExact(d.bonusB)} joining bonus / cashback`;
+    $('subB').textContent=subB;
+    $('cardA').classList.toggle('winner',aWins);$('cardB').classList.toggle('winner',bWins); document.querySelectorAll('.winner-pill').forEach(x=>x.remove()); if(aWins)$('cardA').insertAdjacentHTML('beforeend','<span class="winner-pill">Lower cost</span>'); if(bWins)$('cardB').insertAdjacentHTML('beforeend','<span class="winner-pill">Lower cost</span>');
+    if(aWins){$('resultTitle').textContent=`Buying outright is ${moneyExact(diff)} cheaper over ${months} months.`;$('resultLead').textContent='You pay more at the start, but your lower ongoing SIM-only cost wins across the full comparison period.';$('savingMetric').textContent=moneyExact(diff);$('savingSub').textContent='Saved by buying outright';}
+    else if(bWins){$('resultTitle').textContent=`The contract is ${moneyExact(diff)} cheaper over ${months} months.`;$('resultLead').textContent='On the prices entered, the contract has the lower total cost across the full comparison period.';$('savingMetric').textContent=moneyExact(diff);$('savingSub').textContent='Saved with the contract';}
+    else{$('resultTitle').textContent=`Both options cost the same over ${months} months.`;$('resultLead').textContent='The decision comes down to upfront cash, flexibility and the quality of the included mobile plan.';$('savingMetric').textContent=moneyExact(0);$('savingSub').textContent='No price difference';}
+    if(crossing&&crossing<months){$('breakEvenMetric').textContent=`Month ${crossing}`;$('breakEvenSub').textContent='Cost advantage changes around here';}else{$('breakEvenMetric').textContent='No flip';$('breakEvenSub').textContent='The same option stays ahead in this period';}
+    $('insightList').innerHTML=makeInsights(d,months).map(x=>`<li>${x}</li>`).join('');
+    const labels=d.seriesA.map((_,i)=>`M${i+1}`);
+    if(!$('step4').hidden){
+      if(chart){chart.data.labels=labels;chart.data.datasets[0].data=d.seriesA;chart.data.datasets[1].data=d.seriesB;chart.update('none');}
+      else{
+        Chart.defaults.font.family="'IBM Plex Mono', monospace";
+        chart=new Chart($('costChart'),{type:'line',data:{labels,datasets:[{label:'Buy outright + SIM',data:d.seriesA,borderColor:'#08775f',backgroundColor:'rgba(8,119,95,.08)',borderWidth:2.5,pointRadius:0,tension:.15},{label:'Phone contract',data:d.seriesB,borderColor:'#c77a16',backgroundColor:'rgba(199,122,22,.08)',borderWidth:2.5,borderDash:[6,4],pointRadius:0,tension:.15}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:18,color:'#66726d'}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${moneyExact(c.parsed.y)}`}}},scales:{x:{ticks:{autoSkip:true,maxTicksLimit:10,color:'#7e8984'},grid:{display:false}},y:{ticks:{color:'#7e8984',callback:v=>money(v)},grid:{color:'#e5e2d8'}}}}});
+      }
     }
   }
 
-  update();
+  $('brand').addEventListener('change',populateModels);
+  $('model').addEventListener('change',populateStorage);
+  $('modelCustom').addEventListener('change',()=>{updatePriceStatus();syncProgress();});
+  $('storage').addEventListener('change',()=>{updatePriceStatus();syncProgress();});
+  $('lookupPrice').addEventListener('click',lookupPhonePrice);
+  $('compareMonths').addEventListener('input',update);
+  ['otpPrice','basicPlan','bonusAmountA','monthlyPayment','contractMonths','upfrontAmount','bonusAmountB','dataA','speedA','dataB','speedB'].forEach(id=>{
+    $(id).addEventListener('input',update);
+    $(id).addEventListener('change',()=>syncProgress());
+  });
+  ['paymentIncludesPlan','paymentPhoneOnly'].forEach(id=>$(id).addEventListener('change',()=>{update();syncProgress(false);}));
+  wireReveal('hasBonusA','bonusFieldA');wireReveal('hasUpfront','upfrontField');wireReveal('hasBonusB','bonusFieldB');wireUnlimited('unlimitedA','dataA');wireUnlimited('unlimitedB','dataB');
+  ['hasBonusA','hasUpfront','hasBonusB'].forEach(id=>$(id).addEventListener('change',()=>syncProgress(false)));
+  ['unlimitedA','unlimitedB'].forEach(id=>$(id).addEventListener('change',()=>syncProgress(true)));
+  populateModels();update();syncProgress(false);
 })();
 </script>
 </body>
