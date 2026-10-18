@@ -36,7 +36,7 @@ test('all-month ties are not break-even flips', () => {
   assert.equal(findCrossing([10,20,30], [10,20,30]), null);
 });
 test('temporary equality is not a flip', () => {
-  assert.equal(findCrossing([10,20,30,40],[20,20,20,20]), 4);
+  assert.equal(findCrossing([10,20,30,40],[20,20,20,20]), 3);
   assert.equal(findCrossing([10,20,30],[20,20,40]), null);
 });
 test('final month reversal is counted', () => {
