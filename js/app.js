@@ -322,8 +322,11 @@
     stopLookup();
     $('brand').value = Object.hasOwn(catalogue, data.brand) || data.brand === 'Other' ? data.brand : '';
     populateModels();
-    if ($('brand').value === 'Other') $('modelCustom').value = String(data.modelCustom || '').slice(0,120);
-    else {
+    if ($('brand').value === 'Other') {
+      $('modelCustom').value = String(data.modelCustom || '').slice(0,120);
+      currentCustom = $('modelCustom').value.trim();
+    } else {
+      currentCustom = '';
       $('model').value = String(data.model || '');
       populateStorage();
     }
