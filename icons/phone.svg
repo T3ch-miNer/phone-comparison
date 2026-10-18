@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Phone deal comparator">
+<rect width="512" height="512" rx="108" fill="#0f1a19"/>
+<rect x="147" y="63" width="218" height="386" rx="38" fill="#f6f3ea"/>
+<rect x="163" y="93" width="186" height="312" rx="12" fill="#0f6e56"/>
+<path d="M198 272L244 319 317 219" fill="none" stroke="#f6f3ea" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="221" y="78" width="70" height="8" rx="4" fill="#0f1a19"/>
+<circle cx="256" cy="426" r="11" fill="#0f1a19"/>
+</svg>
