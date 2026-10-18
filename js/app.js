@@ -171,7 +171,9 @@
     if (one) revealStep('step2', scroll); else hideStep('step2');
     if (two) {
       revealStep('step3', false);
+      const firstReveal = $('step4').hidden;
       revealStep('step4', false);
+      if (firstReveal && chart) requestAnimationFrame(() => chart.resize());
     } else {
       hideStep('step3');
       hideStep('step4');
@@ -370,18 +372,26 @@
     }
   }
 
-  $('brand').addEventListener('change', () => { invalidatePhone(); $('modelCustom').value=''; populateModels(); syncProgress(false); });
+  $('brand').addEventListener('change', () => { invalidatePhone(); $('modelCustom').value=''; currentCustom=''; populateModels(); syncProgress(false); });
   $('model').addEventListener('change', () => { invalidatePhone(); populateStorage(); syncProgress(false); });
   $('modelCustom').addEventListener('input', () => syncProgress(false));
   $('modelCustom').addEventListener('change', () => {
-    if (currentCustom !== $('modelCustom').value) { stopLookup(); currentCustom = $('modelCustom').value; }
+    const next = $('modelCustom').value.trim();
+    if (currentCustom && currentCustom !== next) invalidatePhone();
+    else if (currentCustom !== next) stopLookup();
+    currentCustom = next;
     syncProgress(false);
   });
   $('storage').addEventListener('change', () => { invalidatePhone(); syncProgress(false); });
   $('lookupPrice').addEventListener('click', lookupPhonePrice);
   optionIDs.forEach(id => {
     $(id).addEventListener('input', () => syncProgress(false));
-    $(id).addEventListener('change', () => syncProgress(false));
+    $(id).addEventListener('change', () => {
+      syncProgress(false);
+      if (id === 'otpPrice' && step1Complete() && !$('step2').hidden) {
+        $('step2').scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
   });
   ['paymentIncludesPlan','paymentPhoneOnly'].forEach(id => $(id).addEventListener('change', () => syncProgress(false)));
   [['hasBonusA','bonusFieldA'],['hasUpfront','upfrontField'],['hasBonusB','bonusFieldB']].forEach(([toggle,field]) =>
