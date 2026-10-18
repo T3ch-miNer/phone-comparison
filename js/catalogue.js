@@ -9,6 +9,7 @@ window.PHONE_CATALOGUE = Object.freeze({
   updatedAt: '2026-10-18',
   brands: {
     Apple: {
+      'iPhone Duo': ['256 GB','512 GB','1 TB','2 TB'], // Pre-order from 16 October, launches 23 October 2026
       'iPhone 18 Pro': ['256 GB','512 GB','1 TB'],
       'iPhone 18 Pro Max': ['256 GB','512 GB','1 TB','2 TB'],
       'iPhone 17': ['256 GB','512 GB'],
