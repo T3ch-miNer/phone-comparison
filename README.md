@@ -311,11 +311,12 @@ icons/phone.svg            SVG app icon
 
 ### Curated phone catalogue
 
-The handset selector is maintained manually and was refreshed on **18 October 2026**, including iPhone 18 Pro/Pro Max, Google Pixel 11 family, Galaxy Z Fold8/Flip8, Xiaomi 17 family and selected other models. The catalogue is **not a live inventory database** and does not claim that every colour, capacity or variant is available in every German shop.
+The handset selector is maintained manually and was refreshed on **18 October 2026**, including the pre-order iPhone Duo, iPhone 18 Pro/Pro Max, Google Pixel 11 family, Galaxy Z Fold8/Flip8, Xiaomi 17 family and selected other models. The catalogue is **not a live inventory database** and does not claim that every colour, capacity or variant is available in every German shop.
 
 The model list was cross-checked against manufacturer information:
 
 - [Apple iPhone model identification](https://support.apple.com/de-de/108044)
+- [Apple iPhone Duo specifications](https://www.apple.com/de/iphone-duo/specs/)
 - [Samsung Galaxy S26 specifications](https://www.samsung.com/de/smartphones/galaxy-s26-ultra/specs/)
 - [Google Pixel device comparison](https://store.google.com/de/magazine/compare_pixel)
 - [Xiaomi 17 specifications](https://www.mi.com/de/product/xiaomi-17/specs/)
