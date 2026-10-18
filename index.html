@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1a19">
+<link rel="manifest" href="./app.webmanifest">
+<link rel="icon" href="./icons/phone.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Phone Deal Comparator">
+<meta property="og:description" content="Compare the true cost of a smartphone outright or on contract, including fees and bonuses.">
 <meta name="description" content="Compare the real cost of buying a phone outright with a SIM-only plan versus taking a phone contract.">
 <title>Phone Deal Comparator — Outright vs Contract</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,6 +160,16 @@ footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top
   .inline-action{align-items:stretch;flex-direction:column}.price-entry-row{grid-template-columns:1fr}.btn{width:100%}.hero{text-align:left}.hero-badges{justify-content:flex-start}.progress{display:none}
 }
 @media(max-width:470px){.summary-grid{grid-template-columns:1fr}.plan-fields{grid-template-columns:1fr}.wrap{padding-left:10px;padding-right:10px}.option-card{padding:16px}.chart-inner{height:260px}}
+
+.result-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.action-status{min-height:1.4em;margin:6px 0 10px;font-size:12px;color:var(--green-dark)}
+.share-output{width:100%;margin:0 0 14px;min-width:0}
+.validation-hint{font-size:12px;color:var(--danger);margin:12px 0 0}
+#periodNotice{margin:10px 0 0}
+#catalogueUpdated{display:block;margin-top:7px}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #c77a16;outline-offset:2px}
+@media(max-width:470px){.result-actions{flex-direction:column}.result-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progressive-section.section-revealed{animation:none}*{transition:none!important}}
 </style>
 </head>
 <body>
@@ -173,7 +189,7 @@ footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top
     <div class="panel-body">
       <div class="grid">
         <div class="field col-4"><label for="brand">Brand</label><select id="brand"><option value="">Choose brand</option><option>Apple</option><option>Samsung</option><option>Google</option><option>OnePlus</option><option>Xiaomi</option><option>Nothing</option><option>Motorola</option><option value="Other">Other</option></select></div>
-        <div class="field col-4"><label for="model" id="modelLabel">Model</label><select id="model" disabled><option value="">Choose brand first</option></select><input type="text" id="modelCustom" placeholder="Type model name" autocomplete="off" hidden></div>
+        <div class="field col-4"><label for="model" id="modelLabel">Model</label><select id="model" disabled><option value="">Choose brand first</option></select><input type="text" id="modelCustom" placeholder="Type model name" autocomplete="off" hidden maxlength="120"><span class="hint" id="customModelHint" hidden>For Other, model and storage are optional. You can continue with a price alone.</span></div>
         <div class="field col-4"><label for="storage">Storage</label><select id="storage" disabled><option value="">Choose model first</option></select></div>
       </div>
 
@@ -187,14 +203,14 @@ footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top
             </div>
             <span class="hint">Use the lowest realistic delivered price for the exact storage/version.</span>
           </div>
-          <div class="price-status" id="priceStatus"><span class="status-dot"></span><span>Select a phone, then use <strong>Check price</strong>. Automatic lookup is prepared for a backend endpoint; if unavailable, the button opens an idealo search.</span></div>
+          <div class="price-status" id="priceStatus" role="status" aria-live="polite"></div><span class="hint" id="catalogueUpdated"></span>
         </div>
       </div>
 
       <div class="range-box">
         <div class="range-top"><span>Comparison period</span><strong id="compareMonthsLabel">24 months</strong></div>
         <input type="range" id="compareMonths" min="6" max="60" value="24" step="1" aria-label="Comparison period in months">
-        <div class="range-scale"><span>6 mo</span><span>24 mo</span><span>36 mo</span><span>60 mo</span></div>
+        <div class="range-scale"><span>6 mo</span><span>24 mo</span><span>36 mo</span><span>60 mo</span></div><p class="hint" id="periodNotice" aria-live="polite"></p>
       </div>
     </div>
   </section>
@@ -205,10 +221,12 @@ footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top
       <div class="option-grid">
         <div class="option-card a">
           <div class="option-title"><div><span class="tag tag-a">Option A</span><h3>Buy phone outright</h3></div></div>
-          <div class="field"><label for="basicPlan">SIM-only plan per month</label><div class="money"><span>€</span><input type="number" id="basicPlan" value="" placeholder="e.g. 15" min="0" step="0.01" inputmode="decimal"></div><span class="hint">What you would pay each month if you own the phone yourself.</span></div>
+          <div class="field"><label for="carrierA">SIM-only network (optional)</label><select id="carrierA"><option value="">Not specified</option><option>Telekom</option><option>Vodafone</option><option>O2</option><option>1&amp;1</option><option>Other</option></select></div><div class="field"><label for="basicPlan">SIM-only plan per month</label><div class="money"><span>€</span><input type="number" id="basicPlan" value="" placeholder="e.g. 15" min="0" step="0.01" inputmode="decimal"></div><span class="hint">What you would pay each month if you own the phone yourself.</span></div>
           <div class="row-toggle"><label class="switch"><input type="checkbox" id="hasBonusA"><span></span></label><label for="hasBonusA">I get trade-in / cashback</label></div>
           <div class="reveal" id="bonusFieldA"><div class="field"><label for="bonusAmountA">Trade-in / cashback value</label><div class="money"><span>€</span><input type="number" id="bonusAmountA" value="0" min="0" step="0.01"></div></div></div>
-          <div class="info-callout">Upfront cost = phone price minus any trade-in/cashback. After that, you only pay your SIM plan.</div>
+          <div class="field" style="margin-top:15px"><label for="feeA">Other one-off charges</label><div class="money"><span>€</span><input type="number" id="feeA" value="0" min="0" step="0.01" inputmode="decimal"></div><span class="hint">Shipping or other purchase costs.</span></div>
+<div class="field"><label for="riseA">Annual SIM price increase (%)</label><div class="suffix"><input type="number" id="riseA" value="0" min="0" max="100" step="0.1" inputmode="decimal"><span>%</span></div><span class="hint">Optional assumption, applied from month 13.</span></div>
+<div class="info-callout">Phone and checkout fees are paid upfront. Cashback is deducted from the overall estimated cost.</div>
         </div>
 
         <div class="option-card b">
@@ -220,13 +238,17 @@ footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top
           <div class="reveal" id="upfrontField"><div class="field"><label for="upfrontAmount">Upfront payment</label><div class="money"><span>€</span><input type="number" id="upfrontAmount" value="0" min="0" step="0.01"></div></div></div>
           <div class="row-toggle"><label class="switch"><input type="checkbox" id="hasBonusB"><span></span></label><label for="hasBonusB">Contract includes joining bonus / cashback</label></div>
           <div class="reveal" id="bonusFieldB"><div class="field"><label for="bonusAmountB">Joining bonus / cashback value</label><div class="money"><span>€</span><input type="number" id="bonusAmountB" value="0" min="0" step="0.01"></div></div></div>
+<div class="field"><label for="carrierB">Contract network (optional)</label><select id="carrierB"><option value="">Not specified</option><option>Telekom</option><option>Vodafone</option><option>O2</option><option>1&amp;1</option><option>Other</option></select><span class="hint">A label only, not a tariff or price quote.</span></div>
+<div class="field"><label for="feeB">Connection / shipping charges</label><div class="money"><span>€</span><input type="number" id="feeB" value="0" min="0" step="0.01" inputmode="decimal"></div></div>
+<div class="field"><label for="riseB">Annual contract price increase (%)</label><div class="suffix"><input type="number" id="riseB" value="0" min="0" max="100" step="0.1" inputmode="decimal"><span>%</span></div><span class="hint">Only applies to phone + plan contracts. Phone-only instalments stay fixed.</span></div>
         </div>
-      </div>
+      </div>      <p id="validationStatus" class="validation-hint" role="status" aria-live="polite"></p>
+    
     </div>
   </section>
 
   <section class="panel progressive-section" id="step3" aria-labelledby="plan-heading" hidden>
-    <div class="panel-head"><span class="step">3</span><div><h2 id="plan-heading">Compare what the mobile plans include</h2><p>Cost is only half the decision. Add the data and speed so the summary can explain what you gain or give up.</p></div></div>
+    <div class="panel-head"><span class="step">3</span><div><h2 id="plan-heading">Plan details (optional)</h2><p>Your price comparison is available below. Add data and speed to compare plan quality as well.</p></div></div>
     <div class="panel-body">
       <div class="plan-grid">
         <div class="plan-card"><h3>Your SIM-only plan</h3><div class="plan-fields"><div class="field"><label for="dataA">Data</label><div class="suffix"><input type="number" id="dataA" value="" placeholder="e.g. 20" min="0" step="0.1"><span>GB</span></div></div><div class="field"><label for="speedA">Max speed</label><div class="suffix"><input type="number" id="speedA" value="" placeholder="e.g. 150" min="0" step="1"><span>Mbps</span></div></div></div><div class="row-toggle"><label class="switch"><input type="checkbox" id="unlimitedA"><span></span></label><label for="unlimitedA">Unlimited data</label></div></div>
@@ -250,216 +272,24 @@ footer{text-align:center;color:#8fa39c;font-size:11px;line-height:1.6;margin-top
       </div>
     </div>
     <div class="comparison-body">
-      <ul class="insight-list" id="insightList"></ul>
+<div class="result-actions" aria-label="Comparison actions">
+<button class="btn btn-secondary" id="saveComparison" type="button">Save in this browser</button>
+<button class="btn btn-secondary" id="loadComparison" type="button">Restore saved</button>
+<button class="btn btn-primary" id="shareComparison" type="button">Copy shareable link</button>
+</div>
+<p class="action-status" id="actionStatus" role="status" aria-live="polite"></p>
+<input class="share-output" type="text" id="shareLink" aria-label="Shareable comparison link" readonly hidden>
+<ul class="insight-list" id="insightList"></ul>
       <div class="cost-cards"><div class="cost-card" id="cardA"><div class="label">Buy outright + SIM-only</div><div class="total" id="totalA">€0</div><div class="sub" id="subA"></div></div><div class="cost-card" id="cardB"><div class="label">Phone contract</div><div class="total" id="totalB">€0</div><div class="sub" id="subB"></div></div></div>
-      <div class="chart-box"><div class="chart-title"><div><h3>Cumulative cost over time</h3><span>Hover / tap the chart to compare each month.</span></div></div><div class="chart-inner"><canvas id="costChart" role="img" aria-label="Cumulative cost comparison of buying a phone outright versus a phone contract"></canvas></div></div>
-      <div class="disclaimer">Assumption: once the phone contract ends, you switch to the SIM-only monthly price entered in Option A. Joining bonuses, cashback and trade-in values are treated as full credits against the overall option cost, not as a cap on the upfront payment. This is a planning estimate; check the provider's exact contract, price rises, eligibility and cancellation terms.</div>
+      <div class="chart-box"><div class="chart-title"><div><h3>Cumulative cost over time</h3><span>Hover / tap the chart to compare each month.</span></div></div><div class="chart-inner"><canvas id="costChart" role="img" aria-label="Cumulative cost comparison of buying a phone outright versus a phone contract"></canvas></div><p id="chartUnavailable" class="hint" hidden></p></div>
+      <div class="disclaimer">Assumptions: the comparison covers at least the complete contract commitment. After the contract ends, Option B switches to the SIM-only plan entered in Option A. Cashback is credited against total cost, but timing and eligibility are not modelled. Annual price changes are optional estimates. Check your actual contract, fees and cancellation conditions.</div>
     </div>
   </section>
 
   <footer>Built to compare the real cost of a phone, not just the advertised monthly number.</footer>
 </main>
-<script>
-(() => {
-  const $ = id => document.getElementById(id);
-  const money = n => new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(Number.isFinite(n)?n:0);
-  const money2 = n => new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number.isFinite(n)?n:0);
-  const moneyExact = n => {
-    const value = Number.isFinite(n) ? n : 0;
-    const hasCents = Math.abs(value - Math.round(value)) > 0.0001;
-    return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',minimumFractionDigits:hasCents?2:0,maximumFractionDigits:2}).format(value);
-  };
-  const val = id => Math.max(0, parseFloat($(id).value) || 0);
-
-  const catalogue = {
-    Apple: {'iPhone 17':['256 GB','512 GB'], 'iPhone 17 Pro':['256 GB','512 GB','1 TB'], 'iPhone 17 Pro Max':['256 GB','512 GB','1 TB'], 'iPhone Air':['256 GB','512 GB','1 TB'], 'iPhone 17e':['128 GB','256 GB','512 GB'], 'iPhone 16':['128 GB','256 GB','512 GB']},
-    Samsung: {'Galaxy S26':['128 GB','256 GB','512 GB'], 'Galaxy S26+':['256 GB','512 GB'], 'Galaxy S26 Ultra':['256 GB','512 GB','1 TB'], 'Galaxy Z Flip7':['256 GB','512 GB'], 'Galaxy Z Fold7':['256 GB','512 GB','1 TB'], 'Galaxy A56':['128 GB','256 GB']},
-    Google: {'Pixel 10':['128 GB','256 GB'], 'Pixel 10 Pro':['128 GB','256 GB','512 GB','1 TB'], 'Pixel 10 Pro XL':['256 GB','512 GB','1 TB'], 'Pixel 10 Pro Fold':['256 GB','512 GB'], 'Pixel 9a':['128 GB','256 GB']},
-    OnePlus: {'OnePlus 15':['256 GB','512 GB'], 'OnePlus 13':['256 GB','512 GB'], 'OnePlus 13R':['256 GB'], 'Nord 5':['256 GB','512 GB']},
-    Xiaomi: {'Xiaomi 16':['256 GB','512 GB'], 'Xiaomi 16 Pro':['256 GB','512 GB','1 TB'], 'Xiaomi 15':['256 GB','512 GB'], 'Redmi Note 15 Pro':['256 GB','512 GB']},
-    Nothing: {'Phone (3)':['256 GB','512 GB'], 'Phone (3a)':['128 GB','256 GB'], 'Phone (3a) Pro':['256 GB']},
-    Motorola: {'Edge 60 Pro':['256 GB','512 GB'], 'Razr 60 Ultra':['512 GB'], 'Moto G86':['256 GB']},
-    Other: {}
-  };
-
-  function getModelValue(){
-    return $('brand').value === 'Other' ? $('modelCustom').value.trim() : $('model').value;
-  }
-  function populateModels(){
-    const brand=$('brand').value, model=$('model'), custom=$('modelCustom'), storage=$('storage');
-    model.innerHTML=''; custom.value=''; storage.innerHTML='<option value="">Choose model first</option>'; storage.disabled=true;
-    if(!brand){
-      model.hidden=false; custom.hidden=true; $('modelLabel').htmlFor='model'; model.innerHTML='<option value="">Choose brand first</option>'; model.disabled=true;
-      updatePriceStatus(); syncProgress(); return;
-    }
-    if(brand==='Other'){
-      model.hidden=true; model.disabled=true; custom.hidden=false; $('modelLabel').htmlFor='modelCustom';
-      storage.innerHTML='<option value="">Choose storage</option>';
-      ['64 GB','128 GB','256 GB','512 GB','1 TB','Not sure'].forEach(x=>storage.add(new Option(x,x)));
-      storage.disabled=false; custom.focus();
-    }else{
-      custom.hidden=true; model.hidden=false; $('modelLabel').htmlFor='model'; model.disabled=false; model.insertAdjacentHTML('beforeend','<option value="">Choose model</option>');
-      Object.keys(catalogue[brand]||{}).forEach(m=>model.add(new Option(m,m)));
-    }
-    updatePriceStatus(); syncProgress();
-  }
-  function populateStorage(){
-    const brand=$('brand').value, model=getModelValue(), storage=$('storage');
-    if(brand==='Other'){ syncProgress(); return; }
-    storage.innerHTML='';
-    if(!brand||!model){storage.innerHTML='<option value="">Choose model first</option>';storage.disabled=true;updatePriceStatus();syncProgress();return}
-    storage.disabled=false; storage.add(new Option('Choose storage',''));
-    (catalogue[brand]?.[model]||[]).forEach(s=>storage.add(new Option(s,s)));
-    updatePriceStatus(); syncProgress();
-  }
-  function selectedPhone(){ return [$('brand').value,getModelValue(),$('storage').value].filter(Boolean).join(' '); }
-  function updatePriceStatus(text,kind){ const el=$('priceStatus'); el.className='price-status'+(kind?' '+kind:''); el.querySelector('span:last-child').innerHTML=text||'Select a phone, then use <strong>Check price</strong>. Automatic lookup is prepared for a backend endpoint; if unavailable, the button opens an idealo search.'; }
-
-  async function lookupPhonePrice(){
-    const q=selectedPhone(); if(!$('brand').value||!getModelValue()){updatePriceStatus('Choose a brand and model first.','warn');return}
-    updatePriceStatus('Looking for a current outright price…','');
-    try{
-      const params=new URLSearchParams({brand:$('brand').value,model:getModelValue(),storage:$('storage').value});
-      const r=await fetch('/api/phone-price?'+params.toString(),{headers:{'Accept':'application/json'}});
-      if(!r.ok) throw new Error('No backend price service');
-      const d=await r.json();
-      if(typeof d.price!=='number') throw new Error('Invalid price result');
-      $('otpPrice').value=d.price.toFixed(2); update(); syncProgress();
-      const source=d.source||'price service';
-      updatePriceStatus(`Found <strong>${money2(d.price)}</strong> via ${source}. Please verify the exact storage, colour and shipping before buying. <a href="${d.url||'#'}" target="_blank" rel="noopener">View offer ↗</a>`,'ok');
-    }catch(e){
-      const query=encodeURIComponent(q);
-      const url='https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q='+query;
-      updatePriceStatus(`A direct automatic price feed is not connected yet. <a href="${url}" target="_blank" rel="noopener">Open ${q} on idealo.de ↗</a>, then paste the best delivered price here. The page is already prepared for a future <code>/api/phone-price</code> endpoint.`,'warn');
-      window.open(url,'_blank','noopener');
-    }
-  }
-
-  function wireReveal(checkId,boxId){ const c=$(checkId),b=$(boxId); const sync=()=>{b.classList.toggle('show',c.checked);update()}; c.addEventListener('change',sync);sync(); }
-  function wireUnlimited(checkId,inputId){ const c=$(checkId),i=$(inputId); const sync=()=>{i.disabled=c.checked;update()};c.addEventListener('change',sync);sync(); }
-
-  const hasValue = id => $(id).value.trim() !== '';
-  function step1Complete(){
-    return Boolean($('brand').value && getModelValue() && $('storage').value && hasValue('otpPrice') && val('otpPrice') > 0);
-  }
-  function step2Complete(){
-    if(!hasValue('basicPlan') || !hasValue('monthlyPayment') || !hasValue('contractMonths')) return false;
-    if(parseInt($('contractMonths').value,10) < 1) return false;
-    if($('hasBonusA').checked && !hasValue('bonusAmountA')) return false;
-    if($('hasUpfront').checked && !hasValue('upfrontAmount')) return false;
-    if($('hasBonusB').checked && !hasValue('bonusAmountB')) return false;
-    return true;
-  }
-  function step3Complete(){
-    const dataAOk=$('unlimitedA').checked || (hasValue('dataA') && val('dataA')>0);
-    const dataBOk=$('unlimitedB').checked || (hasValue('dataB') && val('dataB')>0);
-    return dataAOk && dataBOk && hasValue('speedA') && val('speedA')>0 && hasValue('speedB') && val('speedB')>0;
-  }
-  function revealStep(id,scroll=true){
-    const el=$(id);
-    if(!el.hidden) return false;
-    el.hidden=false; el.classList.remove('section-revealed'); void el.offsetWidth; el.classList.add('section-revealed');
-    if(scroll) setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),190);
-    if(id==='step4') setTimeout(()=>{ update(); if(chart) chart.resize(); },260);
-    return true;
-  }
-  function hideStep(id){
-    const el=$(id); if(el.hidden) return; el.hidden=true; el.classList.remove('section-revealed');
-  }
-  function updateProgressIndicator(){
-    const states=[true,step1Complete(),step1Complete()&&step2Complete(),step1Complete()&&step2Complete()&&step3Complete()];
-    document.querySelectorAll('.progress [data-progress]').forEach((bar,i)=>{
-      bar.classList.toggle('is-complete',states[i]);
-      bar.classList.toggle('is-current',!states[i] && (i===0 || states[i-1]));
-    });
-  }
-  function syncProgress(scroll=true){
-    const one=step1Complete();
-    if(!one){ hideStep('step2');hideStep('step3');hideStep('step4');updateProgressIndicator();return; }
-    revealStep('step2',scroll);
-    const two=step2Complete();
-    if(!two){ hideStep('step3');hideStep('step4');updateProgressIndicator();return; }
-    revealStep('step3',scroll);
-    const three=step3Complete();
-    if(!three){ hideStep('step4');updateProgressIndicator();return; }
-    revealStep('step4',scroll);
-    updateProgressIndicator();
-  }
-
-  function compute(months){
-    const plan=val('basicPlan'), phone=val('otpPrice'), monthly=val('monthlyPayment'), duration=Math.max(1,parseInt($('contractMonths').value)||1);
-    const includesPlan=$('paymentIncludesPlan').checked, upfront=$('hasUpfront').checked?val('upfrontAmount'):0, bonusA=$('hasBonusA').checked?val('bonusAmountA'):0, bonusB=$('hasBonusB').checked?val('bonusAmountB'):0;
-    let a=0,b=0; const seriesA=[],seriesB=[];
-    for(let m=1;m<=months;m++){
-      if(m===1){ a+=phone; a-=bonusA; } a+=plan; seriesA.push(a);
-      if(m===1){ b+=upfront; b-=bonusB; }
-      if(m<=duration){b+=monthly;if(!includesPlan)b+=plan}else b+=plan;
-      seriesB.push(b);
-    }
-    return {plan,phone,monthly,duration,includesPlan,upfront,bonusA,bonusB,seriesA,seriesB,totalA:seriesA.at(-1)||0,totalB:seriesB.at(-1)||0};
-  }
-  function findCrossing(a,b){
-    let prev=a[0]-b[0];
-    for(let i=1;i<a.length;i++){const cur=a[i]-b[i]; if(cur===0||prev===0||(prev<0&&cur>0)||(prev>0&&cur<0)) return i+1; prev=cur} return null;
-  }
-  function planText(unlimited,data){return unlimited?'unlimited data':`${data} GB`}
-  function makeInsights(d,months){
-    const ua=$('unlimitedA').checked,ub=$('unlimitedB').checked,da=val('dataA'),db=val('dataB'),sa=val('speedA'),sb=val('speedB');
-    const items=[];
-    const checkoutA=d.phone, checkoutB=d.upfront;
-    const upfrontDiff=Math.abs(checkoutA-checkoutB);
-    if(checkoutA>checkoutB)items.push(`<strong>Lower day-one cost:</strong> the contract needs ${moneyExact(upfrontDiff)} less cash at checkout.`); else if(checkoutB>checkoutA)items.push(`<strong>Lower day-one cost:</strong> buying outright needs ${moneyExact(upfrontDiff)} less cash at checkout.`); else items.push('<strong>Upfront cash:</strong> both options require roughly the same cash at checkout.');
-    if(d.bonusB>0)items.push(`<strong>Contract incentive:</strong> the ${moneyExact(d.bonusB)} joining bonus / cashback is deducted from the contract's total cost.`);
-    else if(d.bonusA>0)items.push(`<strong>Outright incentive:</strong> the ${moneyExact(d.bonusA)} trade-in / cashback is deducted from the outright option's total cost.`);
-    if(ua!==ub){items.push(`<strong>Data:</strong> ${ub?'the contract':'your SIM-only plan'} includes unlimited data, while ${ub?'your SIM-only plan': 'the contract'} has ${ub?da:db} GB.`)} else if(!ua&&!ub&&da!==db){const diff=Math.abs(db-da);items.push(`<strong>Data:</strong> ${db>da?'the contract':'your SIM-only plan'} gives ${diff} GB more data each month.`)} else items.push(`<strong>Data:</strong> both plans offer ${planText(ua,da)}.`);
-    if(sa&&sb&&sa!==sb){const faster=sb>sa?'the contract':'your SIM-only plan'; const ratio=Math.max(sa,sb)/Math.min(sa,sb);items.push(`<strong>Speed:</strong> ${faster} is up to ${ratio>=1.95?ratio.toFixed(1)+'×':Math.abs(sb-sa)+' Mbps'} ${ratio>=1.95?'faster':'higher'} on the stated maximum speed.`)} else if(sa===sb)items.push(`<strong>Speed:</strong> both plans list the same ${sa} Mbps maximum speed.`);
-    const diff=Math.abs(d.totalA-d.totalB); const expensive=d.totalA>d.totalB?'buying outright':'the contract'; const betterPlan=(ub&&!ua)||(!ua&&!ub&&db>da)||(sb>sa); if(diff>0&&betterPlan&&expensive==='the contract'){items.push(`<strong>What the extra money buys:</strong> the contract costs ${moneyExact(diff)} more over ${months} months, but it also gives the stronger plan on the details entered.`)}
-    return items.slice(0,4);
-  }
-
-  let chart;
-  function update(){
-    let months=Math.min(60,Math.max(6,parseInt($('compareMonths').value)||24)); $('compareMonthsLabel').textContent=`${months} months`;
-    const d=compute(months), diff=Math.abs(d.totalA-d.totalB), aWins=d.totalA<d.totalB, bWins=d.totalB<d.totalA, crossing=findCrossing(d.seriesA,d.seriesB);
-    $('totalA').textContent=moneyExact(d.totalA); $('totalB').textContent=moneyExact(d.totalB); $('avgA').textContent=money2(d.totalA/months); $('avgB').textContent=money2(d.totalB/months);
-    let subA=`${moneyExact(d.phone)} phone + ${money2(d.plan)}/month SIM plan`;
-    if(d.bonusA>0) subA+=` − ${moneyExact(d.bonusA)} trade-in / cashback`;
-    $('subA').textContent=subA;
-    let subB=`${moneyExact(d.upfront)} upfront + ${money2(d.monthly)}/month for ${d.duration} months${d.includesPlan?' (plan included)':' + SIM plan'}`;
-    if(d.bonusB>0) subB+=` − ${moneyExact(d.bonusB)} joining bonus / cashback`;
-    $('subB').textContent=subB;
-    $('cardA').classList.toggle('winner',aWins);$('cardB').classList.toggle('winner',bWins); document.querySelectorAll('.winner-pill').forEach(x=>x.remove()); if(aWins)$('cardA').insertAdjacentHTML('beforeend','<span class="winner-pill">Lower cost</span>'); if(bWins)$('cardB').insertAdjacentHTML('beforeend','<span class="winner-pill">Lower cost</span>');
-    if(aWins){$('resultTitle').textContent=`Buying outright is ${moneyExact(diff)} cheaper over ${months} months.`;$('resultLead').textContent='You pay more at the start, but your lower ongoing SIM-only cost wins across the full comparison period.';$('savingMetric').textContent=moneyExact(diff);$('savingSub').textContent='Saved by buying outright';}
-    else if(bWins){$('resultTitle').textContent=`The contract is ${moneyExact(diff)} cheaper over ${months} months.`;$('resultLead').textContent='On the prices entered, the contract has the lower total cost across the full comparison period.';$('savingMetric').textContent=moneyExact(diff);$('savingSub').textContent='Saved with the contract';}
-    else{$('resultTitle').textContent=`Both options cost the same over ${months} months.`;$('resultLead').textContent='The decision comes down to upfront cash, flexibility and the quality of the included mobile plan.';$('savingMetric').textContent=moneyExact(0);$('savingSub').textContent='No price difference';}
-    if(crossing&&crossing<months){$('breakEvenMetric').textContent=`Month ${crossing}`;$('breakEvenSub').textContent='Cost advantage changes around here';}else{$('breakEvenMetric').textContent='No flip';$('breakEvenSub').textContent='The same option stays ahead in this period';}
-    $('insightList').innerHTML=makeInsights(d,months).map(x=>`<li>${x}</li>`).join('');
-    const labels=d.seriesA.map((_,i)=>`M${i+1}`);
-    if(!$('step4').hidden){
-      if(chart){chart.data.labels=labels;chart.data.datasets[0].data=d.seriesA;chart.data.datasets[1].data=d.seriesB;chart.update('none');}
-      else{
-        Chart.defaults.font.family="'IBM Plex Mono', monospace";
-        chart=new Chart($('costChart'),{type:'line',data:{labels,datasets:[{label:'Buy outright + SIM',data:d.seriesA,borderColor:'#08775f',backgroundColor:'rgba(8,119,95,.08)',borderWidth:2.5,pointRadius:0,tension:.15},{label:'Phone contract',data:d.seriesB,borderColor:'#c77a16',backgroundColor:'rgba(199,122,22,.08)',borderWidth:2.5,borderDash:[6,4],pointRadius:0,tension:.15}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{usePointStyle:true,boxWidth:8,padding:18,color:'#66726d'}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${moneyExact(c.parsed.y)}`}}},scales:{x:{ticks:{autoSkip:true,maxTicksLimit:10,color:'#7e8984'},grid:{display:false}},y:{ticks:{color:'#7e8984',callback:v=>money(v)},grid:{color:'#e5e2d8'}}}}});
-      }
-    }
-  }
-
-  $('brand').addEventListener('change',populateModels);
-  $('model').addEventListener('change',populateStorage);
-  $('modelCustom').addEventListener('change',()=>{updatePriceStatus();syncProgress();});
-  $('storage').addEventListener('change',()=>{updatePriceStatus();syncProgress();});
-  $('lookupPrice').addEventListener('click',lookupPhonePrice);
-  $('compareMonths').addEventListener('input',update);
-  ['otpPrice','basicPlan','bonusAmountA','monthlyPayment','contractMonths','upfrontAmount','bonusAmountB','dataA','speedA','dataB','speedB'].forEach(id=>{
-    $(id).addEventListener('input',update);
-    $(id).addEventListener('change',()=>syncProgress());
-  });
-  ['paymentIncludesPlan','paymentPhoneOnly'].forEach(id=>$(id).addEventListener('change',()=>{update();syncProgress(false);}));
-  wireReveal('hasBonusA','bonusFieldA');wireReveal('hasUpfront','upfrontField');wireReveal('hasBonusB','bonusFieldB');wireUnlimited('unlimitedA','dataA');wireUnlimited('unlimitedB','dataB');
-  ['hasBonusA','hasUpfront','hasBonusB'].forEach(id=>$(id).addEventListener('change',()=>syncProgress(false)));
-  ['unlimitedA','unlimitedB'].forEach(id=>$(id).addEventListener('change',()=>syncProgress(true)));
-  populateModels();update();syncProgress(false);
-})();
-</script>
+<script src="./js/catalogue.js"></script>
+<script src="./js/calculator.js"></script>
+<script src="./js/app.js"></script>
 </body>
 </html>

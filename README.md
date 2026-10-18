@@ -40,7 +40,7 @@ Select the **brand → model → storage** combination you want to compare.
 
 - Brand and model are linked dynamically
 - Storage options update based on the selected handset
-- Choosing **Other** turns the model selector into a free-text field
+- Choosing **Other** makes the model and storage optional, so a valid outright price can unlock the comparison
 - The app is prepared for an automatic phone-price endpoint
 - If no pricing backend is connected, the price-check action falls back to an **idealo.de search** so the user can enter the best delivered price manually
 
@@ -108,7 +108,7 @@ Compare plan benefits
 See the final comparison
 ```
 
-Each stage unlocks only after the required inputs from the previous stage are complete. The next section then fades in and scrolls naturally into view.
+The payment stage unlocks after the phone and price are valid. Once payment details are entered, the results appear and plan-quality inputs remain optional.
 
 This makes the calculator feel more like a guided decision flow than a spreadsheet.
 
@@ -273,13 +273,77 @@ Until such a backend is connected, the UI falls back to an idealo.de product sea
 - [x] Responsive layout
 - [ ] Live handset price API
 - [ ] Automatic lowest-price lookup
-- [ ] Carrier presets for Telekom / Vodafone / O2 and others
-- [ ] Shareable comparison links
-- [ ] Save / restore comparisons locally
-- [ ] Include annual contract price increases
-- [ ] PWA / installable mobile experience
+- [x] Provider selectors for Telekom / Vodafone / O2 / 1&1 (labels only, not tariff feeds)
+- [x] Shareable comparison links
+- [x] Save / restore comparisons locally
+- [x] Optional annual contract and SIM price increases
+- [x] PWA manifest and offline shell (installation support varies by browser)
 
 ---
+
+---
+
+## ✅ October 2026 improvements
+
+The application now supports:
+
+- **Other phone without a required model or storage**. Choose Other, enter an outright price and continue.
+- **Fair comparison horizons**. The chosen period cannot finish before the contract ends.
+- **Optional plan quality**. Data and speed are no longer prerequisites for cost results.
+- **One-off costs and annual rises**. Enter shipping/connection fees and optional percentage increases. Contract rises only apply to bundled plans. Annual changes start in month 13, repeating in months 25, 37, etc.
+- **Safer price lookup**. The static site no longer attempts a non-existent local API endpoint. It opens an idealo search if no endpoint is configured. Backend price data is checked, and displayed text and links are inserted safely.
+- **Save, restore and share**. Save one comparison to local browser storage or copy a link encoding the inputs.
+- **Offline app shell**. The service worker caches the calculator's own files. Chart.js and external fonts use CDNs, so the interactive chart may be unavailable offline. Summary calculations remain available.
+- **Automated financial tests**. Run `node --test tests/calculator.test.js` with Node.js 18 or later.
+
+### Code layout
+
+```text
+index.html                 Interface, CSS and semantic markup
+js/catalogue.js            Curated handset models and storage variants
+js/calculator.js           Pure, testable financial calculations
+js/app.js                  Input validation, price lookup, UI and sharing
+tests/calculator.test.js   Unit tests with Node's built-in test runner
+app.webmanifest            PWA metadata
+service-worker.js          App-shell offline cache
+icons/phone.svg            SVG app icon
+```
+
+### Curated phone catalogue
+
+The handset selector is maintained manually and was refreshed on **18 October 2026**, including the pre-order iPhone Duo, iPhone 18 Pro/Pro Max, Google Pixel 11 family, Galaxy Z Fold8/Flip8, Xiaomi 17 family and selected other models. The catalogue is **not a live inventory database** and does not claim that every colour, capacity or variant is available in every German shop.
+
+The model list was cross-checked against manufacturer information:
+
+- [Apple iPhone model identification](https://support.apple.com/de-de/108044)
+- [Apple iPhone Duo specifications](https://www.apple.com/de/iphone-duo/specs/)
+- [Samsung Galaxy S26 specifications](https://www.samsung.com/de/smartphones/galaxy-s26-ultra/specs/)
+- [Google Pixel device comparison](https://store.google.com/de/magazine/compare_pixel)
+- [Xiaomi 17 specifications](https://www.mi.com/de/product/xiaomi-17/specs/)
+- [OnePlus 15](https://www.oneplus.com/de/15)
+- [Motorola Razr 70 Ultra](https://www.motorola.com/de/de/p/phones/razr/razr-70-ultra/pmipmjk44m2)
+
+To add a model or capacity, edit `js/catalogue.js`. For an unlisted device, users can always select Other and enter the price manually.
+
+### How future automatic pricing is configured
+
+The GitHub Pages deployment is static and **does not have a live handset-price provider**. To enable an authorised provider later, add an API URL through a meta tag in the document head:
+
+```html
+<meta name="phone-price-api" content="https://your-domain.example/api/phone-price">
+```
+
+The endpoint must accept `brand`, `model` and `storage` query parameters and return a JSON object with a finite positive `price`, optionally `source` and a verified `url`. Use a server-side proxy for any provider secrets. Do not embed API keys in this static frontend.
+
+### Financial assumptions
+
+- Bonuses and cashback are counted towards the **total cost at month one**, regardless of when the provider actually pays them. Cashback timing, credit approval and trade-in eligibility are not modelled.
+- The upfront-cash insight uses the handset or contract upfront price plus fees, **before rebates**.
+- If a comparison continues beyond the contract, the contract option switches to the selected SIM-only plan, at its then-assumed cost.
+- A 'phone only' instalment is treated as fixed, and the same SIM-only plan is charged on both sides of the comparison.
+- All prices are estimates entered by the user. Carrier selections are labels, not real carrier integrations.
+- Shared URLs contain the entered amounts and device selections. Do not share a link if you want those inputs kept private.
+
 
 ## 🔮 Planned pricing integration
 
